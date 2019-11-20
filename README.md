@@ -1,10 +1,8 @@
-README
+Brief introduction to R for Epidemiologists
 ================
 20 November 2019
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
-# Brief introduction to R for Epidemiologists
 
 ### Background:
 
