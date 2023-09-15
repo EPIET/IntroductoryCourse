@@ -1,0 +1,188 @@
+---
+title: "SimOb_Rinjects"
+format: html
+editor: visual
+---
+
+## Install packages and load libraries
+
+```{r, Packages}
+# Check if the 'pacman' package is installed, if not install it:
+if (!requireNamespace("pacman", quietly = TRUE)) install.packages("pacman")
+
+# Load the required libraries into the current R session:
+pacman::p_load(rio, 
+               here, 
+               tidyverse, 
+               skimr,
+               plyr,
+               janitor,
+               lubridate,
+               gtsummary, 
+               flextable,
+               officer,
+               epikit, 
+               apyramid, 
+               scales)
+
+# Load EpiStats from Github:
+#pacman::p_load_gh("Epiconcept-Paris/EpiStats")
+```
+
+## Import your data
+
+```{r, Import_data}
+# Import the raw data set:
+linelist <- rio::import(here::here("data", "Copenhagen_raw.csv"))
+```
+
+## Explore your data
+
+```{r, Explore_data}
+head(linelist)
+dim(linelist)
+str(linelist)
+skimr::skim(linelist)
+names(linelist)
+
+```
+
+## Clean your data
+
+### Modify variables
+
+We want to modify the "column type" of many variables, so that we can do future calculations with them.
+
+| Variable name                                                                                               | Original  | Desired | Hint |
+|-------------------------------|--------------|--------------|--------------|
+| sex                                                                                                         | character | factor  |      |
+| group                                                                                                       | integer   | factor  |      |
+| class                                                                                                       | integer   | factor  |      |
+| All the clinical symptom variables                                                                          | integer   | logical |      |
+| All the food variables                                                                                      | integer   | logical |      |
+| All the food variables representing the amount of specific foods eaten (those finishing with a capital "D") | integer   | factor  |      |
+| dayonset                                                                                                    | character | date    |      |
+| starthour                                                                                                   | integer   |         |      |
+
+: Variable types to modify
+
+Let's start transforming one-by-one the first three variables in the table: `sex`, `group`, and `class`. We will also provide labels to the variable group with `plyr::revalue`, as 0 and 1 can be difficult to interpret when these mean something other than "no" and "yes", respectively.
+
+```{r, mutate_simple}
+#| output: false
+
+linelist <- linelist %>% 
+  dplyr::mutate(
+    sex = as.factor(sex),
+    group = as.factor(group),
+    group = plyr::revalue(
+      group, c("0" = "teacher", "1" = "student")),
+    class = as.factor(class))
+ 
+```
+
+For the **symptoms** and **food variables**, we are going to show you a couple of different ways to carry out the same variable type transformation in a *set* of variables, so you don't need to do one variable at a time. We are showing you these ways so you see alternative ways to do the same thing.
+
+1.  For the variables that are clinical symptoms, we will list them one by one and show you the use of `mutate(across( ))`.
+
+```{r, mutate_cs}
+#| output: false
+
+linelist <- linelist %>% 
+  dplyr::mutate(
+    # clinical symptoms
+    across(c(diarrhoea, bloody, vomiting,
+             abdo, nausea, fever,headache, jointpain), 
+           ~as.logical(.)
+           )
+    )
+```
+
+2.  For the variables that are food items and food doses, we will show you how to first create a vector of names, following by how to the use of `mutate(across(all_of( )))` on this vector.
+
+```{r, mutate_food}
+#| output: false
+
+# Create a vector with all the food variables representing the amount of specific foods items eaten (those finishing with a capital "D")
+food_dose <- linelist %>% 
+    select(ends_with("D", ignore.case = FALSE)) %>% 
+    names()
+food_dose <- c("tunaD", "shrimpsD", "greenD", "vealD", 
+                "pastaD", "rocketD", "sauceD", "breadD",
+                "champagneD", "beerD", "redwineD", "whitewineD")
+
+# Create a vecor with all food items. To do this, we can remove the capital D of food_dose by using gsub() to replace the pattern "D" by nothing ("").
+food_items <- gsub("D", "", food_dose)
+# Add variable "meal"
+food_items <- c(food_items, "meal") 
+
+
+linelist <- linelist %>% 
+  dplyr::mutate(
+    # food dose variables
+    across(all_of(food_dose), ~as.logical(.)),
+    # food items variables
+    across(all_of(food_items), ~as.logical(.))) 
+  
+```
+
+***Note***: The tilde (`~`) bellow is used to apply the transformation `as.logical(.)` to each selected column.
+
+For the date variables...
+
+If you want to put it all together, you would have:
+
+```{r, mutate_vectors}
+# Create a vector with all the food variables representing the amount of specific foods items eaten (those finishing with a capital "D")
+food_dose <- linelist %>% 
+    select(ends_with("D", ignore.case = FALSE)) %>% 
+    names()
+food_dose <- c("tunaD", "shrimpsD", "greenD", "vealD", 
+                "pastaD", "rocketD", "sauceD", "breadD",
+                "champagneD", "beerD", "redwineD", "whitewineD")
+
+# Create a vecor with all food items. To do this, we can remove the capital D of food_dose by using gsub() to replace the pattern "D" by nothing ("").
+food_items <- gsub("D", "", food_dose)
+# Add variable "meal"
+food_items <- c(food_items, "meal") 
+
+
+linelist <- linelist %>% 
+  dplyr::mutate(
+    sex = as.factor(sex),
+    group = as.factor(group),
+    group = plyr::revalue(
+      group, c("0" = "teacher", "1" = "student")),
+    class = as.factor(class)) %>%
+  # clinical symptoms variables
+  dplyr::mutate(
+        across(c(diarrhoea, bloody, vomiting,
+                 abdo, nausea, fever, 
+                 headache, jointpain), ~as.logical(.)),
+        # food dose variables
+        across(all_of(food_dose), ~as.logical(.)),
+        # food items variables
+        across(all_of(food_items), ~as.logical(.))
+        ) 
+  
+
+```
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
