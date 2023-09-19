@@ -145,7 +145,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>               scales)</span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Load EpiStats from Github:</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">#pacman::p_load_gh("Epiconcept-Paris/EpiStats")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># pacman::p_load_gh("Epiconcept-Paris/EpiStats")</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># pacman::p_load_gh("Epiconcept-Paris/EpiStats@release_1.4-1_2020-04-21")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="import-your-data" class="level2">
@@ -870,16 +871,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="clean-your-data" class="level2">
 <h2 class="anchored" data-anchor-id="clean-your-data">Clean your data</h2>
-<section id="modify-variables" class="level3">
-<h3 class="anchored" data-anchor-id="modify-variables">Modify variables</h3>
-<p>We want to modify the “column type” of many variables, so that we can do future calculations with them.</p>
+<section id="modify-variables-format" class="level3">
+<h3 class="anchored" data-anchor-id="modify-variables-format">Modify variables format</h3>
+<p>We want to modify the “variable format” or “column type” of many variables, so that we can do future calculations with them.</p>
 <table class="table">
 <caption>Variable types to modify</caption>
 <colgroup>
-<col style="width: 42%">
-<col style="width: 19%">
-<col style="width: 19%">
-<col style="width: 19%">
+<col style="width: 28%">
+<col style="width: 23%">
+<col style="width: 23%">
+<col style="width: 23%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -940,7 +941,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tr>
 </tbody>
 </table>
-<p>Let’s start transforming one-by-one the first three variables in the table: <code>sex</code>, <code>group</code>, and <code>class</code>. We will also provide labels to the variable group with <code>plyr::revalue</code>, as 0 and 1 can be difficult to interpret when these mean something other than “no” and “yes”, respectively.</p>
+<section id="sex-group-and-class" class="level4">
+<h4 class="anchored" data-anchor-id="sex-group-and-class">Sex, group and class</h4>
+<p>Let’s start transforming one-by-one the first three variables in the table: <code>sex</code>, <code>group</code>, and <code>class</code>. We will also provide labels to the variable <code>group</code> with <code>plyr::revalue</code>, as 0 and 1 can be difficult to interpret when these mean something other than “no” and “yes”, respectively.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
@@ -950,7 +953,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>      group, <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"teacher"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"student"</span>)),</span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">class =</span> <span class="fu">as.factor</span>(class))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>For the <strong>symptoms</strong> and <strong>food variables</strong>, we are going to show you a couple of different ways to carry out the same variable type transformation in a <em>set</em> of variables, so you don’t need to do one variable at a time. We are showing you these ways so you see alternative ways to do the same thing.</p>
+</section>
+<section id="symptoms-and-food-variables" class="level4">
+<h4 class="anchored" data-anchor-id="symptoms-and-food-variables">Symptoms and Food variables</h4>
+<p>For these variables, we are going to show you a couple of different ways to carry out the same variable type transformation in a <em>set</em> of variables, so you don’t need to do one variable at a time. We are showing you these ways so you see alternative ways to do the same thing.</p>
 <ol type="1">
 <li>For the variables that are clinical symptoms, we will list them one by one and show you the use of <code>mutate(across( ))</code>.</li>
 </ol>
@@ -985,45 +991,70 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
 <span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
 <span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># food dose variables</span></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">all_of</span>(food_dose), <span class="sc">~</span><span class="fu">as.logical</span>(.)),</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">all_of</span>(food_dose), <span class="sc">~</span><span class="fu">as.factor</span>(.)),</span>
 <span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># food items variables</span></span>
 <span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">all_of</span>(food_items), <span class="sc">~</span><span class="fu">as.logical</span>(.))) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><strong><em>Note</em></strong>: The tilde (<code>~</code>) bellow is used to apply the transformation <code>as.logical(.)</code> to each selected column.</p>
-<p>For the date variables…</p>
+<p><strong><em>Note</em></strong>: The tilde (<code>~</code>) bellow is used to apply the transformation <code>as.logical(.)</code> to each selected column, which in our case is either all columns included in <code>food_items</code> and <code>food_dose.</code></p>
+</section>
+<section id="date-and-time-variables" class="level4">
+<h4 class="anchored" data-anchor-id="date-and-time-variables">Date and time variables</h4>
+<p>You can use <code>lubridate::dmy()</code> to mutate the <code>dayonset</code> variable into a date variable. Note that we are using the function <code>dmy()</code> because dates are formatted as day, then month (abbreviated character string), then year (i.e.&nbsp;12nov2006).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Have a look at how the data is stored</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(linelist<span class="sc">$</span>dayonset)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "12nov2006" ""          ""          ""          "12nov2006" "13nov2006"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(linelist<span class="sc">$</span>dayonset)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "character"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Update linelist:</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Change column to date class:</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">dayonset =</span> lubridate<span class="sc">::</span><span class="fu">dmy</span>(dayonset))</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Check class of updated column:</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(linelist<span class="sc">$</span>dayonset)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Date"</code></pre>
+</div>
+</div>
+<p>Therefore, we can combine them with onset dates using the `lubridate::ymd_h` function (remember that we already converted `dayonset` to R date format which has the order year, then month, then day).</p>
 <p>If you want to put it all together, you would have:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector with all the food variables representing the amount of specific foods items eaten (those finishing with a capital "D")</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>food_dose <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">ends_with</span>(<span class="st">"D"</span>, <span class="at">ignore.case =</span> <span class="cn">FALSE</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>()</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>food_dose <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"tunaD"</span>, <span class="st">"shrimpsD"</span>, <span class="st">"greenD"</span>, <span class="st">"vealD"</span>, </span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                <span class="st">"pastaD"</span>, <span class="st">"rocketD"</span>, <span class="st">"sauceD"</span>, <span class="st">"breadD"</span>,</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                <span class="st">"champagneD"</span>, <span class="st">"beerD"</span>, <span class="st">"redwineD"</span>, <span class="st">"whitewineD"</span>)</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vecor with all food items. To do this, we can remove the capital D of food_dose by using gsub() to replace the pattern "D" by nothing ("").</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>food_items <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"D"</span>, <span class="st">""</span>, food_dose)</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Add variable "meal"</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>food_items <span class="ot">&lt;-</span> <span class="fu">c</span>(food_items, <span class="st">"meal"</span>) </span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">as.factor</span>(sex),</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> <span class="fu">as.factor</span>(group),</span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> plyr<span class="sc">::</span><span class="fu">revalue</span>(</span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>      group, <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"teacher"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"student"</span>)),</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">class =</span> <span class="fu">as.factor</span>(class)) <span class="sc">%&gt;%</span></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># clinical symptoms variables</span></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">across</span>(<span class="fu">c</span>(diarrhoea, bloody, vomiting,</span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>                 abdo, nausea, fever, </span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>                 headache, jointpain), <span class="sc">~</span><span class="fu">as.logical</span>(.)),</span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># food dose variables</span></span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>        <span class="fu">across</span>(<span class="fu">all_of</span>(food_dose), <span class="sc">~</span><span class="fu">as.logical</span>(.)),</span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># food items variables</span></span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">across</span>(<span class="fu">all_of</span>(food_items), <span class="sc">~</span><span class="fu">as.logical</span>(.))</span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>        ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector with all the food variables representing the amount of specific foods items eaten (those finishing with a capital "D")</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>food_dose <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">ends_with</span>(<span class="st">"D"</span>, <span class="at">ignore.case =</span> <span class="cn">FALSE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>()</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>food_dose <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"tunaD"</span>, <span class="st">"shrimpsD"</span>, <span class="st">"greenD"</span>, <span class="st">"vealD"</span>, </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                <span class="st">"pastaD"</span>, <span class="st">"rocketD"</span>, <span class="st">"sauceD"</span>, <span class="st">"breadD"</span>,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>                <span class="st">"champagneD"</span>, <span class="st">"beerD"</span>, <span class="st">"redwineD"</span>, <span class="st">"whitewineD"</span>)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vecor with all food items. To do this, we can remove the capital D of food_dose by using gsub() to replace the pattern "D" by nothing ("").</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>food_items <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"D"</span>, <span class="st">""</span>, food_dose)</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Add variable "meal"</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>food_items <span class="ot">&lt;-</span> <span class="fu">c</span>(food_items, <span class="st">"meal"</span>) </span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">as.factor</span>(sex),</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> <span class="fu">as.factor</span>(group),</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> plyr<span class="sc">::</span><span class="fu">revalue</span>(</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>      group, <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"teacher"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"student"</span>)),</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">class =</span> <span class="fu">as.factor</span>(class)) <span class="sc">%&gt;%</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># clinical symptoms variables</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">across</span>(<span class="fu">c</span>(diarrhoea, bloody, vomiting,</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>                 abdo, nausea, fever, </span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>                 headache, jointpain), <span class="sc">~</span><span class="fu">as.logical</span>(.)),</span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># food dose variables</span></span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>        <span class="fu">across</span>(<span class="fu">all_of</span>(food_dose), <span class="sc">~</span><span class="fu">as.factor</span>(.)),</span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># food items variables</span></span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">across</span>(<span class="fu">all_of</span>(food_items), <span class="sc">~</span><span class="fu">as.logical</span>(.))</span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>        ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>The following `from` values were not present in `x`: 0, 1</code></pre>
 </div>
@@ -1031,11 +1062,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <a href="https://quarto.org" class="uri">https://quarto.org</a>.</p>
 </section>
 </section>
+</section>
 <section id="running-code" class="level2">
 <h2 class="anchored" data-anchor-id="running-code">Running Code</h2>
 <p>When you click the <strong>Render</strong> button a document will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 2</code></pre>
 </div>
