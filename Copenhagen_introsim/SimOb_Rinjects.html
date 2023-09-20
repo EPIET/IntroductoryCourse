@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>SimOb_Rinjects</title>
+<title>SimOb Inject 13 - Data import and cleaning</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -96,6 +96,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <script src="SimOb_Rinjects_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="SimOb_Rinjects_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="SimOb_Rinjects_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="SimOb_Rinjects_files/libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+<script src="SimOb_Rinjects_files/libs/tabwid-1.1.3/tabwid.js"></script>
 
 
 </head>
@@ -108,7 +110,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">SimOb_Rinjects</h1>
+<h1 class="title">SimOb Inject 13 - Data import and cleaning</h1>
 </div>
 
 
@@ -124,7 +126,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </header>
 
 <section id="install-packages-and-load-libraries" class="level2">
-<h2 class="anchored" data-anchor-id="install-packages-and-load-libraries">Install packages and load libraries</h2>
+<h2 class="anchored" data-anchor-id="install-packages-and-load-libraries">1. Install packages and load libraries</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if the 'pacman' package is installed, if not install it:</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">"pacman"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) <span class="fu">install.packages</span>(<span class="st">"pacman"</span>)</span>
@@ -150,14 +152,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </section>
 <section id="import-your-data" class="level2">
-<h2 class="anchored" data-anchor-id="import-your-data">Import your data</h2>
+<h2 class="anchored" data-anchor-id="import-your-data">2. Import your data</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import the raw data set:</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> rio<span class="sc">::</span><span class="fu">import</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"Copenhagen_raw.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="explore-your-data" class="level2">
-<h2 class="anchored" data-anchor-id="explore-your-data">Explore your data</h2>
+<section id="explore-and-clean-your-data" class="level2">
+<h2 class="anchored" data-anchor-id="explore-and-clean-your-data">3. Explore and clean your data</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(linelist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -868,19 +870,136 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 [36] "redwine"    "redwineD"   "whitewine"  "whitewineD" "dayonset"  </code></pre>
 </div>
 </div>
+<p>Let’s explore and manage some variables in detail.</p>
+<section id="age" class="level4">
+<h4 class="anchored" data-anchor-id="age">Age</h4>
+<p>Through visual exploration of the <code>age</code> histogram we see that there is at least one very high value, likely implausible. You can then create a cross-tabulation of variables age and group to have a better idea of how your data looks like.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Have a look at the histogram  </span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(linelist<span class="sc">$</span>age)   </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="SimOb_Rinjects_files/figure-html/age_exploration-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create cross-tab with the group variable:  </span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>janitor<span class="sc">::</span><span class="fu">tabyl</span>(<span class="at">dat =</span> linelist, age, group) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> age 0   1
+   8 0   1
+  15 0  11
+  16 1  99
+  17 0 115
+  18 0 112
+  19 0  39
+  20 0   3
+  26 1   0
+  29 1   0
+  30 1   0
+  31 1   0
+  32 1   0
+  33 1   0
+  34 1   0
+  39 1   0
+  43 1   0
+  54 1   0
+  56 1   0
+  58 2   0
+  59 1   0
+  65 1   0
+ 180 0   1</code></pre>
+</div>
+</div>
+<p>Note that <code>group</code> is coded as 0 and 1, and these may be difficult to interpret when they mean something other than “no” and “yes”, respectively. From the codebook, you know that teachers are represented by 0, and students by 1. Let’s change this to make our lives easier:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert group to a factor and label 0 as teacher, 1 as student:</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group =</span> <span class="fu">factor</span>(group, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"teacher"</span>, <span class="st">"student"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, have a look at your cross-tab again:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>janitor<span class="sc">::</span><span class="fu">tabyl</span>(<span class="at">dat =</span> linelist, age, group) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> age teacher student
+   8       0       1
+  15       0      11
+  16       1      99
+  17       0     115
+  18       0     112
+  19       0      39
+  20       0       3
+  26       1       0
+  29       1       0
+  30       1       0
+  31       1       0
+  32       1       0
+  33       1       0
+  34       1       0
+  39       1       0
+  43       1       0
+  54       1       0
+  56       1       0
+  58       2       0
+  59       1       0
+  65       1       0
+ 180       0       1</code></pre>
+</div>
+</div>
+<p>With this table, we can more easily identify ages that are likely to be typographic errors. Specifically:</p>
+<ul>
+<li><p>There is one teacher aged 16 (likely digit reversal - should be 61)</p></li>
+<li><p>There is one student aged 8 (likely missing a digit - should be 18)</p></li>
+<li><p>There is one student aged 180 (likely has an extra digit - should be 18)</p></li>
+</ul>
+<p>Assuming you have contacted the school to make sure your suspicions about the actual ages are correct, we can now correct them, using <code>case_when()</code>. We create logical conditions to identify the incorrect ages, combining the values for age with the group they belong to:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Update incorrect ages to the correct values with case_when:  </span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span>       </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span>                         </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>           <span class="fu">case_when</span>(                            </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>             <span class="co"># Where respondent is 16 and a teacher, change age to 61:</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>             age <span class="sc">==</span> <span class="dv">16</span> <span class="sc">&amp;</span> group <span class="sc">==</span> <span class="st">"teacher"</span> <span class="sc">~</span> <span class="dv">61</span>,              </span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>             <span class="co"># where respondent is 8 or 180 and a student, change age to 18:</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>             age <span class="sc">==</span> <span class="dv">8</span> <span class="sc">&amp;</span> group <span class="sc">==</span> <span class="st">"student"</span> <span class="sc">~</span> <span class="dv">18</span>,              </span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>             age <span class="sc">==</span> <span class="dv">180</span> <span class="sc">&amp;</span> group <span class="sc">==</span> <span class="st">"student"</span> <span class="sc">~</span> <span class="dv">18</span>,              </span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>             <span class="co"># Keep remaining values as is:              </span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>             <span class="cn">TRUE</span> <span class="sc">~</span> <span class="fu">as.numeric</span>(age)              </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>             )                    </span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>         ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
-<section id="clean-your-data" class="level2">
-<h2 class="anchored" data-anchor-id="clean-your-data">Clean your data</h2>
+<section id="dose-response" class="level4">
+<h4 class="anchored" data-anchor-id="dose-response">Dose response</h4>
+<p>Now let’s create a summary table of the dose response columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: check_dose_cols</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| tbl-cap: no caption</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create summary table for dose response columns: </span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>drtable <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span>       </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Select all the columns with column names that end in upper case 'D':   </span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">ends_with</span>(<span class="st">"D"</span>, <span class="at">ignore.case =</span> <span class="cn">FALSE</span>)) <span class="sc">%&gt;%</span>       </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create the summary table, excluding missing values:   </span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  gtsummary<span class="sc">::</span><span class="fu">tbl_summary</span>(<span class="at">missing =</span> <span class="st">"no"</span>) <span class="sc">%&gt;%</span>       </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Convert to flextable:   </span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  gtsummary<span class="sc">::</span><span class="fu">as_flex_table</span>() </span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Print the summary table: </span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>drtable</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div class="tabwid"><style>.cl-363738ca{}.cl-36157b7c{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-36157bc2{font-family:'Arial';font-size:6.6pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;position: relative;bottom:3.3pt;}.cl-36157bcc{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-361f76c2{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-361f76e0{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:2pt;padding-top:2pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-361f76ea{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-361f76f4{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-361f76fe{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:15pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-361f7708{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-361fed14{width:1.304in;background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-361fed6e{width:1.033in;background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-361fed8c{width:1.304in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-361fedaa{width:1.033in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-361fedb4{width:1.304in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-361fedd2{width:1.033in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-361fede6{width:1.304in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-361fedf0{width:1.033in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-361fee0e{width:1.304in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-361fee22{width:1.033in;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-361fee40{width:1.304in;background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-361fee54{width:1.033in;background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-361fee68{width:1.304in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-361fee86{width:1.033in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-363738ca"><thead><tr style="overflow-wrap:break-word;"><th class="cl-361fed14"><p class="cl-361f76c2"><span class="cl-36157b7c">Characteristic</span></p></th><th class="cl-361fed6e"><p class="cl-361f76e0"><span class="cl-36157b7c">N = 397</span><span class="cl-36157bc2">1</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-361fed8c"><p class="cl-361f76ea"><span class="cl-36157bcc">tunaD</span></p></td><td class="cl-361fedaa"><p class="cl-361f76f4"><span class="cl-36157bcc"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">0</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">110 (29%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">1</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">78 (20%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">2</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">155 (41%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">3</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">38 (10.0%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fede6"><p class="cl-361f76ea"><span class="cl-36157bcc">shrimpsD</span></p></td><td class="cl-361fedf0"><p class="cl-361f76f4"><span class="cl-36157bcc"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">0</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">125 (33%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">1</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">35 (9.2%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">2</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">184 (48%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">3</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">36 (9.5%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fee0e"><p class="cl-361f76ea"><span class="cl-36157bcc">greenD</span></p></td><td class="cl-361fee22"><p class="cl-361f76f4"><span class="cl-36157bcc"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">0</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">151 (41%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">1</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">41 (11%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">2</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">147 (40%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">3</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">28 (7.6%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fed8c"><p class="cl-361f76ea"><span class="cl-36157bcc">vealD</span></p></td><td class="cl-361fedaa"><p class="cl-361f76f4"><span class="cl-36157bcc"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">0</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">42 (11%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">1</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">70 (18%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">2</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">184 (48%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">3</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">87 (23%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fede6"><p class="cl-361f76ea"><span class="cl-36157bcc">pastaD</span></p></td><td class="cl-361fedf0"><p class="cl-361f76f4"><span class="cl-36157bcc"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">0</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">44 (12%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">1</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">70 (18%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">2</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">183 (48%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">3</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">85 (22%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fed8c"><p class="cl-361f76ea"><span class="cl-36157bcc">rocketD</span></p></td><td class="cl-361fedaa"><p class="cl-361f76f4"><span class="cl-36157bcc"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">0</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">162 (43%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">1</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">52 (14%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">2</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">126 (34%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">3</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">33 (8.8%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fed8c"><p class="cl-361f76ea"><span class="cl-36157bcc">sauceD</span></p></td><td class="cl-361fedaa"><p class="cl-361f76f4"><span class="cl-36157bcc"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">0</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">206 (58%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">1</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">33 (9.3%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">2</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">87 (25%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">3</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">29 (8.2%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fed8c"><p class="cl-361f76ea"><span class="cl-36157bcc">breadD</span></p></td><td class="cl-361fedaa"><p class="cl-361f76f4"><span class="cl-36157bcc"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">0</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">35 (9.2%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">1</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">51 (13%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">2</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">267 (70%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">3</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">26 (6.9%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fee0e"><p class="cl-361f76ea"><span class="cl-36157bcc">champagneD</span></p></td><td class="cl-361fee22"><p class="cl-361f76f4"><span class="cl-36157bcc"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">0</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">49 (13%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">1</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">208 (56%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">2</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">45 (12%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">3</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">70 (19%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fed8c"><p class="cl-361f76ea"><span class="cl-36157bcc">beerD</span></p></td><td class="cl-361fedaa"><p class="cl-361f76f4"><span class="cl-36157bcc"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">0</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">81 (22%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">1</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">41 (11%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">2</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">57 (16%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">3</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">183 (51%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fed8c"><p class="cl-361f76ea"><span class="cl-36157bcc">redwineD</span></p></td><td class="cl-361fedaa"><p class="cl-361f76f4"><span class="cl-36157bcc"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">0</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">266 (77%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">1</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">31 (9.0%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">2</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">21 (6.1%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">3</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">27 (7.8%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fed8c"><p class="cl-361f76ea"><span class="cl-36157bcc">whitewineD</span></p></td><td class="cl-361fedaa"><p class="cl-361f76f4"><span class="cl-36157bcc"></span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">0</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">100 (28%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">1</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">73 (20%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fedb4"><p class="cl-361f76fe"><span class="cl-36157bcc">2</span></p></td><td class="cl-361fedd2"><p class="cl-361f76f4"><span class="cl-36157bcc">67 (19%)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-361fee40"><p class="cl-361f76fe"><span class="cl-36157bcc">3</span></p></td><td class="cl-361fee54"><p class="cl-361f76f4"><span class="cl-36157bcc">121 (34%)</span></p></td></tr></tbody><tfoot><tr style="overflow-wrap:break-word;"><td colspan="2" class="cl-361fee68"><p class="cl-361f7708"><span class="cl-36157bc2">1</span><span class="cl-36157bcc">n (%)</span></p></td></tr></tfoot></table></div>
+</div>
+</div>
+</section>
 <section id="modify-variables-format" class="level3">
 <h3 class="anchored" data-anchor-id="modify-variables-format">Modify variables format</h3>
 <p>We want to modify the “variable format” or “column type” of many variables, so that we can do future calculations with them.</p>
 <table class="table">
-<caption>Variable types to modify</caption>
+<caption>Table 1_Inject14: Variable types to modify</caption>
 <colgroup>
-<col style="width: 28%">
-<col style="width: 23%">
-<col style="width: 23%">
-<col style="width: 23%">
+<col style="width: 26%">
+<col style="width: 24%">
+<col style="width: 24%">
+<col style="width: 24%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -898,42 +1017,36 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <td></td>
 </tr>
 <tr class="even">
-<td>group</td>
-<td>integer</td>
-<td>factor</td>
-<td></td>
-</tr>
-<tr class="odd">
 <td>class</td>
 <td>integer</td>
 <td>factor</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>All the clinical symptom variables</td>
 <td>integer</td>
 <td>logical</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>All the food variables</td>
 <td>integer</td>
 <td>logical</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>All the food variables representing the amount of specific foods eaten (those finishing with a capital “D”)</td>
 <td>integer</td>
 <td>factor</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>dayonset</td>
 <td>character</td>
 <td>date</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>starthour</td>
 <td>integer</td>
 <td></td>
@@ -943,15 +1056,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 <section id="sex-group-and-class" class="level4">
 <h4 class="anchored" data-anchor-id="sex-group-and-class">Sex, group and class</h4>
-<p>Let’s start transforming one-by-one the first three variables in the table: <code>sex</code>, <code>group</code>, and <code>class</code>. We will also provide labels to the variable <code>group</code> with <code>plyr::revalue</code>, as 0 and 1 can be difficult to interpret when these mean something other than “no” and “yes”, respectively.</p>
+<p>Let’s start transforming one-by-one the first two variables in the table: <code>sex</code>, and <code>class</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">as.factor</span>(sex),</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> <span class="fu">as.factor</span>(group),</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> plyr<span class="sc">::</span><span class="fu">revalue</span>(</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>      group, <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"teacher"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"student"</span>)),</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">class =</span> <span class="fu">as.factor</span>(class))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">as.factor</span>(sex),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">class =</span> <span class="fu">as.factor</span>(class))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="symptoms-and-food-variables" class="level4">
@@ -961,124 +1071,100 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>For the variables that are clinical symptoms, we will list them one by one and show you the use of <code>mutate(across( ))</code>.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># clinical symptoms</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">c</span>(diarrhoea, bloody, vomiting,</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>             abdo, nausea, fever,headache, jointpain), </span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>           <span class="sc">~</span><span class="fu">as.logical</span>(.)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>           )</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># clinical symptoms</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">c</span>(diarrhoea, bloody, vomiting,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>             abdo, nausea, fever,headache, jointpain), </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>           <span class="sc">~</span><span class="fu">as.logical</span>(.)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>           )</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ol start="2" type="1">
 <li>For the variables that are food items and food doses, we will show you how to first create a vector of names, following by how to the use of <code>mutate(across(all_of( )))</code> on this vector.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector with all the food variables representing the amount of specific foods items eaten (those finishing with a capital "D")</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>food_dose <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">ends_with</span>(<span class="st">"D"</span>, <span class="at">ignore.case =</span> <span class="cn">FALSE</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>()</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>food_dose <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"tunaD"</span>, <span class="st">"shrimpsD"</span>, <span class="st">"greenD"</span>, <span class="st">"vealD"</span>, </span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>                <span class="st">"pastaD"</span>, <span class="st">"rocketD"</span>, <span class="st">"sauceD"</span>, <span class="st">"breadD"</span>,</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                <span class="st">"champagneD"</span>, <span class="st">"beerD"</span>, <span class="st">"redwineD"</span>, <span class="st">"whitewineD"</span>)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vecor with all food items. To do this, we can remove the capital D of food_dose by using gsub() to replace the pattern "D" by nothing ("").</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>food_items <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"D"</span>, <span class="st">""</span>, food_dose)</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Add variable "meal"</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>food_items <span class="ot">&lt;-</span> <span class="fu">c</span>(food_items, <span class="st">"meal"</span>) </span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># food dose variables</span></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">all_of</span>(food_dose), <span class="sc">~</span><span class="fu">as.factor</span>(.)),</span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># food items variables</span></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">all_of</span>(food_items), <span class="sc">~</span><span class="fu">as.logical</span>(.))) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector with all the food variables representing the amount of specific foods items eaten (those finishing with a capital "D")</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>food_dose <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">ends_with</span>(<span class="st">"D"</span>, <span class="at">ignore.case =</span> <span class="cn">FALSE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>()</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>food_dose <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"tunaD"</span>, <span class="st">"shrimpsD"</span>, <span class="st">"greenD"</span>, <span class="st">"vealD"</span>, </span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                <span class="st">"pastaD"</span>, <span class="st">"rocketD"</span>, <span class="st">"sauceD"</span>, <span class="st">"breadD"</span>,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>                <span class="st">"champagneD"</span>, <span class="st">"beerD"</span>, <span class="st">"redwineD"</span>, <span class="st">"whitewineD"</span>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vecor with all food items. To do this, we can remove the capital D of food_dose by using gsub() to replace the pattern "D" by nothing ("").</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>food_items <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"D"</span>, <span class="st">""</span>, food_dose)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Add variable "meal"</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>food_items <span class="ot">&lt;-</span> <span class="fu">c</span>(food_items, <span class="st">"meal"</span>) </span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># food dose variables</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">all_of</span>(food_dose), <span class="sc">~</span><span class="fu">as.factor</span>(.)),</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># food items variables</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">all_of</span>(food_items), <span class="sc">~</span><span class="fu">as.logical</span>(.))) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong><em>Note</em></strong>: The tilde (<code>~</code>) bellow is used to apply the transformation <code>as.logical(.)</code> to each selected column, which in our case is either all columns included in <code>food_items</code> and <code>food_dose.</code></p>
 </section>
 <section id="date-and-time-variables" class="level4">
 <h4 class="anchored" data-anchor-id="date-and-time-variables">Date and time variables</h4>
-<p>You can use <code>lubridate::dmy()</code> to mutate the <code>dayonset</code> variable into a date variable. Note that we are using the function <code>dmy()</code> because dates are formatted as day, then month (abbreviated character string), then year (i.e.&nbsp;12nov2006).</p>
+<p>You can use <code>lubridate::dmy()</code> to mutate the <code>dayonset</code> variable into a date variable. Note that we are using the function <code>dmy()</code> because dates are formatted as day, then month (abbreviated character string), then year (i.e.&nbsp;“12nov2006”).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Have a look at how the data is stored</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(linelist<span class="sc">$</span>dayonset)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "12nov2006" ""          ""          ""          "12nov2006" "13nov2006"</code></pre>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Have a look at how the data is stored</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(linelist<span class="sc">$</span>dayonset)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(linelist<span class="sc">$</span>dayonset)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Update linelist:</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Change column to date class:</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">dayonset =</span> lubridate<span class="sc">::</span><span class="fu">dmy</span>(dayonset))</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Check class of updated column:</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(linelist<span class="sc">$</span>dayonset)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(linelist<span class="sc">$</span>dayonset)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "character"</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Update linelist:</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Change column to date class:</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">dayonset =</span> lubridate<span class="sc">::</span><span class="fu">dmy</span>(dayonset))</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Check class of updated column:</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(linelist<span class="sc">$</span>dayonset)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "Date"</code></pre>
-</div>
-</div>
-<p>Therefore, we can combine them with onset dates using the `lubridate::ymd_h` function (remember that we already converted `dayonset` to R date format which has the order year, then month, then day).</p>
-<p>If you want to put it all together, you would have:</p>
+<p>Having a variable that defines “time” in an outbreak investigation can be very useful when creating a case definition. An hour of the day, without a date associated with it doesn’t help you much, thus, you should merge together day and time of onset of symptoms into a single variable. Moreover, you will be using this combined variable later on to create your epicurve. We can combine these two variables by using the <code>lubridate::ymd_h()</code> function.</p>
+<p>Before we proceed, it would be wise to check if any respondents have a value for <code>dayonset</code> but not <code>starthour</code>, or vice versa. The <code>lubridate</code> date-time conversion functions do not have an explicit argument for dealing with missing values, but the <code>truncated = …</code> argument can help prevent spurious date-times being derived from a date-time combination where one value is missing.</p>
+<p>We can check if we have any missing values by cross-tabulating <code>starthour</code> with <code>dayonset</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector with all the food variables representing the amount of specific foods items eaten (those finishing with a capital "D")</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>food_dose <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">ends_with</span>(<span class="st">"D"</span>, <span class="at">ignore.case =</span> <span class="cn">FALSE</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">names</span>()</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>food_dose <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"tunaD"</span>, <span class="st">"shrimpsD"</span>, <span class="st">"greenD"</span>, <span class="st">"vealD"</span>, </span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                <span class="st">"pastaD"</span>, <span class="st">"rocketD"</span>, <span class="st">"sauceD"</span>, <span class="st">"breadD"</span>,</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>                <span class="st">"champagneD"</span>, <span class="st">"beerD"</span>, <span class="st">"redwineD"</span>, <span class="st">"whitewineD"</span>)</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vecor with all food items. To do this, we can remove the capital D of food_dose by using gsub() to replace the pattern "D" by nothing ("").</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>food_items <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"D"</span>, <span class="st">""</span>, food_dose)</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Add variable "meal"</span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>food_items <span class="ot">&lt;-</span> <span class="fu">c</span>(food_items, <span class="st">"meal"</span>) </span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">as.factor</span>(sex),</span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> <span class="fu">as.factor</span>(group),</span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">group =</span> plyr<span class="sc">::</span><span class="fu">revalue</span>(</span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>      group, <span class="fu">c</span>(<span class="st">"0"</span> <span class="ot">=</span> <span class="st">"teacher"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"student"</span>)),</span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">class =</span> <span class="fu">as.factor</span>(class)) <span class="sc">%&gt;%</span></span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># clinical symptoms variables</span></span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">across</span>(<span class="fu">c</span>(diarrhoea, bloody, vomiting,</span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>                 abdo, nausea, fever, </span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>                 headache, jointpain), <span class="sc">~</span><span class="fu">as.logical</span>(.)),</span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># food dose variables</span></span>
-<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>        <span class="fu">across</span>(<span class="fu">all_of</span>(food_dose), <span class="sc">~</span><span class="fu">as.factor</span>(.)),</span>
-<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># food items variables</span></span>
-<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">across</span>(<span class="fu">all_of</span>(food_items), <span class="sc">~</span><span class="fu">as.logical</span>(.))</span>
-<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>        ) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cross-tabulate dayonset with starthour:</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>janitor<span class="sc">::</span><span class="fu">tabyl</span>(<span class="at">dat =</span> linelist, </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>               starthour, </span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>               dayonset)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This shows us that there are two respondents who had an onset date, but are missing onset time (<code>starthour</code>). Since <code>starthour</code> is represented by 1 - 2 digits, we can specify that we want <code>lubridate</code> to also parse date-time combinations that are truncated by up to two digits:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>linelist <span class="ot">&lt;-</span> linelist <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Combine dayonset and starthour in a new date time variable:</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">onset_datetime =</span> lubridate<span class="sc">::</span><span class="fu">ymd_h</span>(<span class="fu">paste</span>(dayonset, starthour), </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                                           <span class="co"># Deal with missing starthour:</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">truncated =</span> <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>The following `from` values were not present in `x`: 0, 1</code></pre>
+<pre><code>Warning: There was 1 warning in `mutate()`.
+ℹ In argument: `onset_datetime = lubridate::ymd_h(paste(dayonset, starthour),
+  truncated = 2)`.
+Caused by warning:
+!  175 failed to parse.</code></pre>
 </div>
 </div>
-<p>Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <a href="https://quarto.org" class="uri">https://quarto.org</a>.</p>
-</section>
-</section>
-</section>
-<section id="running-code" class="level2">
-<h2 class="anchored" data-anchor-id="running-code">Running Code</h2>
-<p>When you click the <strong>Render</strong> button a document will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
+<p>Note that we needed to paste <code>dayonset</code> and <code>starthour</code> together before we could convert the variable to a date-time object. This is because the function expects a single character string, containing both the date and the time, as input.</p>
+<p>The argument <code>truncated = 2</code> will result in dates with missing <code>starthour</code> still being converted to date-time, with the missing time being set to <code>00:00</code> (midnight). Whether you want to deal with missing <code>starthour</code> in this way or prefer to code these date-times as <code>NA</code> will depend on how you want them to be represented in your analysis.</p>
+<p>Now we can check that everything in the new combined date-time variable has parsed correctly:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(linelist<span class="sc">$</span>dayonset)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(linelist<span class="sc">$</span>starthour)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(linelist<span class="sc">$</span>onset_datetime)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-<p>You can add options to executable code like this</p>
+</section>
+</section>
+</section>
+<section id="export-clean-data" class="level1">
+<h1>4. Export clean data</h1>
+<p>Save the cleaned data set before proceeding with using your case definition to identify cases in your dataset.</p>
 <div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 4</code></pre>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>rio<span class="sc">::</span><span class="fu">export</span>(<span class="at">x =</span> linelist, </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">file =</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"Copenhagen_clean.xlsx"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-<p>The <code>echo: false</code> option disables the printing of code (only output is displayed).</p>
 </section>
 
 </main>
