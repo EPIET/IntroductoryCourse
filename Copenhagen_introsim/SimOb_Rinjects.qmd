@@ -1,7 +1,9 @@
 ---
-title: "SimOb_Rinjects"
-format: html
+title: "SimOb Inject 13 - Data import and cleaning"
+format: docx
 editor: visual
+execute: 
+  output: true
 ---
 
 ## 1. Install packages and load libraries
@@ -40,6 +42,7 @@ linelist <- rio::import(here::here("data", "Copenhagen_raw.csv"))
 ## 3. Explore and clean your data
 
 ```{r, Explore_data}
+
 head(linelist)
 dim(linelist)
 str(linelist)
@@ -48,14 +51,91 @@ names(linelist)
 
 ```
 
+Let's explore and manage some variables in detail.
+
+#### Age
+
+Through visual exploration of the `age` histogram we see that there is at least one very high value, likely implausible. You can then create a cross-tabulation of variables age and group to have a better idea of how your data looks like.
+
+```{r age_exploration}
+# Have a look at the histogram  
+hist(linelist$age)   
+# Create cross-tab with the group variable:  
+janitor::tabyl(dat = linelist, age, group) 
+```
+
+Note that `group` is coded as 0 and 1, and these may be difficult to interpret when they mean something other than "no" and "yes", respectively. From the codebook, you know that teachers are represented by 0, and students by 1. Let's change this to make our lives easier:
+
+```{r recode_group}
+# Convert group to a factor and label 0 as teacher, 1 as student:
+linelist <- linelist %>% 
+  mutate(group = factor(group, labels = c("teacher", "student")))
+
+```
+
+Now, have a look at your cross-tab again:
+
+```{r cross-tab_age_group}
+
+janitor::tabyl(dat = linelist, age, group) 
+```
+
+With this table, we can more easily identify ages that are likely to be typographic errors. Specifically:
+
+-   There is one teacher aged 16 (likely digit reversal - should be 61)
+
+-   There is one student aged 8 (likely missing a digit - should be 18)
+
+-   There is one student aged 180 (likely has an extra digit - should be 18)
+
+Assuming you have contacted the school to make sure your suspicions about the actual ages are correct, we can now correct them, using `case_when()`. We create logical conditions to identify the incorrect ages, combining the values for age with the group they belong to:
+
+```{r age_cleaning}
+
+# Update incorrect ages to the correct values with case_when:  
+linelist <- linelist %>%       
+  mutate(age =                         
+           case_when(                            
+             # Where respondent is 16 and a teacher, change age to 61:
+             age == 16 & group == "teacher" ~ 61,              
+             # where respondent is 8 or 180 and a student, change age to 18:
+             age == 8 & group == "student" ~ 18,              
+             age == 180 & group == "student" ~ 18,              
+             # Keep remaining values as is:              
+             TRUE ~ as.numeric(age)              
+             )                    
+         ) 
+```
+
+#### Dose response
+
+Now let's create a summary table of the dose response columns.
+
+```{r }
+
+#| label: check_dose_cols
+#| tbl-cap: no caption
+
+# Create summary table for dose response columns: 
+drtable <- linelist %>%       
+  # Select all the columns with column names that end in upper case 'D':   
+  select(ends_with("D", ignore.case = FALSE)) %>%       
+  # Create the summary table, excluding missing values:   
+  gtsummary::tbl_summary(missing = "no") %>%       
+  # Convert to flextable:   
+  gtsummary::as_flex_table() 
+
+  # Print the summary table: 
+drtable
+```
+
 ### Modify variables format
 
 We want to modify the "variable format" or "column type" of many variables, so that we can do future calculations with them.
 
 | Variable name                                                                                               | Original  | Desired | Hint |
-|--------------------|------------------|------------------|------------------|
+|-------------------|------------------|------------------|------------------|
 | sex                                                                                                         | character | factor  |      |
-| group                                                                                                       | integer   | factor  |      |
 | class                                                                                                       | integer   | factor  |      |
 | All the clinical symptom variables                                                                          | integer   | logical |      |
 | All the food variables                                                                                      | integer   | logical |      |
@@ -63,21 +143,16 @@ We want to modify the "variable format" or "column type" of many variables, so t
 | dayonset                                                                                                    | character | date    |      |
 | starthour                                                                                                   | integer   |         |      |
 
-: Variable types to modify
+: Table 1_Inject14: Variable types to modify
 
 #### Sex, group and class
 
-Let's start transforming one-by-one the first three variables in the table: `sex`, `group`, and `class`. We will also provide labels to the variable `group` with `plyr::revalue`, as 0 and 1 can be difficult to interpret when these mean something other than "no" and "yes", respectively.
+Let's start transforming one-by-one the first two variables in the table: `sex`, and `class`.
 
 ```{r, mutate_simple}
-#| output: false
-
 linelist <- linelist %>% 
   dplyr::mutate(
     sex = as.factor(sex),
-    group = as.factor(group),
-    group = plyr::revalue(
-      group, c("0" = "teacher", "1" = "student")),
     class = as.factor(class))
  
 ```
@@ -89,8 +164,6 @@ For these variables, we are going to show you a couple of different ways to carr
 1.  For the variables that are clinical symptoms, we will list them one by one and show you the use of `mutate(across( ))`.
 
 ```{r, mutate_cs}
-#| output: false
-
 linelist <- linelist %>% 
   dplyr::mutate(
     # clinical symptoms
@@ -104,8 +177,6 @@ linelist <- linelist %>%
 2.  For the variables that are food items and food doses, we will show you how to first create a vector of names, following by how to the use of `mutate(across(all_of( )))` on this vector.
 
 ```{r, mutate_food}
-#| output: false
-
 # Create a vector with all the food variables representing the amount of specific foods items eaten (those finishing with a capital "D")
 food_dose <- linelist %>% 
     select(ends_with("D", ignore.case = FALSE)) %>% 
@@ -149,7 +220,7 @@ linelist <- linelist %>%
 class(linelist$dayonset)
 ```
 
-Having a variable that defines \"time\" in an outbreak investigation can be very useful when creating a case definition. An hour of the day, without a date associated with it doesn\'t help you much, thus, you should merge together day and time of onset of symptoms into a single variable. We can combine these two variables by using the `lubridate::ymd_h()` function.
+Having a variable that defines "time" in an outbreak investigation can be very useful when creating a case definition. An hour of the day, without a date associated with it doesn't help you much, thus, you should merge together day and time of onset of symptoms into a single variable. Moreover, you will be using this combined variable later on to create your epicurve. We can combine these two variables by using the `lubridate::ymd_h()` function.
 
 Before we proceed, it would be wise to check if any respondents have a value for `dayonset` but not `starthour`, or vice versa. The `lubridate` date-time conversion functions do not have an explicit argument for dealing with missing values, but the `truncated = …` argument can help prevent spurious date-times being derived from a date-time combination where one value is missing.
 
@@ -179,64 +250,19 @@ The argument `truncated = 2` will result in dates with missing `starthour` still
 Now we can check that everything in the new combined date-time variable has parsed correctly:
 
 ```{r check_onset_datetime}
+
 head(linelist$dayonset)
 head(linelist$starthour)
 head(linelist$onset_datetime)
 ```
 
-If you want to put it all together, you would have:
+# 4. Export clean data
 
-```{r, mutate_vectors}
-# Create a vector with all the food variables representing the amount of specific foods items eaten (those finishing with a capital "D")
-food_dose <- linelist %>% 
-    select(ends_with("D", ignore.case = FALSE)) %>% 
-    names()
-food_dose <- c("tunaD", "shrimpsD", "greenD", "vealD", 
-                "pastaD", "rocketD", "sauceD", "breadD",
-                "champagneD", "beerD", "redwineD", "whitewineD")
+Save the cleaned data set before proceeding with using your case definition to identify cases in your dataset.
 
-# Create a vecor with all food items. To do this, we can remove the capital D of food_dose by using gsub() to replace the pattern "D" by nothing ("").
-food_items <- gsub("D", "", food_dose)
-# Add variable "meal"
-food_items <- c(food_items, "meal") 
+```{r export_clean_data}
 
-
-linelist <- linelist %>% 
-  dplyr::mutate(
-    sex = as.factor(sex),
-    group = as.factor(group),
-    group = plyr::revalue(
-      group, c("0" = "teacher", "1" = "student")),
-    class = as.factor(class)) %>%
-  # clinical symptoms variables
-  dplyr::mutate(
-        across(c(diarrhoea, bloody, vomiting,
-                 abdo, nausea, fever, 
-                 headache, jointpain), ~as.logical(.)),
-        # food dose variables
-        across(all_of(food_dose), ~as.factor(.)),
-        # food items variables
-        across(all_of(food_items), ~as.logical(.))
-        ) 
-  
+rio::export(x = linelist, 
+            file = here::here("data", "Copenhagen_clean.xlsx"))
 
 ```
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
-```
-
-You can add options to executable code like this
-
-```{r}
-#| echo: false
-2 * 2
-```
-
-The `echo: false` option disables the printing of code (only output is displayed).
