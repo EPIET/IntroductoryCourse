@@ -1,9 +1,9 @@
 ---
-title: "SimOb Inject 13 - Data import and cleaning"
+title: "SimOb Inject 14 - Data import and cleaning"
 format: docx
 editor: visual
 execute: 
-  output: true
+  output: false
 ---
 
 ## 1. Install packages and load libraries
@@ -133,15 +133,15 @@ drtable
 
 We want to modify the "variable format" or "column type" of many variables, so that we can do future calculations with them.
 
-| Variable name                                                                                               | Original  | Desired | Hint |
-|-------------------|------------------|------------------|------------------|
-| sex                                                                                                         | character | factor  |      |
-| class                                                                                                       | integer   | factor  |      |
-| All the clinical symptom variables                                                                          | integer   | logical |      |
-| All the food variables                                                                                      | integer   | logical |      |
-| All the food variables representing the amount of specific foods eaten (those finishing with a capital "D") | integer   | factor  |      |
-| dayonset                                                                                                    | character | date    |      |
-| starthour                                                                                                   | integer   |         |      |
+| Variable name                                                                                               | Original  | Desired | Hint                                                         |
+|---------------------------------|---------------------|----------------------|---------------------------------------------------------|
+| sex                                                                                                         | character | factor  | mutate(), as.factor()                                        |
+| class                                                                                                       | integer   | factor  | mutate(), as.factor()                                        |
+| All the clinical symptom variables                                                                          | integer   | logical | mutate(across()), as.logical()                               |
+| All the food variables                                                                                      | integer   | logical | mutate(across()), as.logical()                               |
+| All the food variables representing the amount of specific foods eaten (those finishing with a capital "D") | integer   | factor  |                                                              |
+| dayonset                                                                                                    | character | date    | lubridate::dmy()                                             |
+| starthour                                                                                                   | integer   |         | paste dayonset and starthour and then use lubridate::ymd_h() |
 
 : Table 1_Inject14: Variable types to modify
 
