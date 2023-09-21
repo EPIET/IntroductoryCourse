@@ -134,7 +134,7 @@ drtable
 We want to modify the "variable format" or "column type" of many variables, so that we can do future calculations with them.
 
 | Variable name                                                                                               | Original  | Desired | Hint                                                         |
-|---------------|---------------|---------------|---------------------------|
+|----------------|----------------|----------------|-------------------------|
 | sex                                                                                                         | character | factor  | mutate(), as.factor()                                        |
 | class                                                                                                       | integer   | factor  | mutate(), as.factor()                                        |
 | All the clinical symptom variables                                                                          | integer   | logical | mutate(across()), as.logical()                               |
@@ -220,7 +220,7 @@ linelist <- linelist %>%
 class(linelist$dayonset)
 ```
 
-Having a variable that defines "time" in an outbreak investigation can be very useful when creating a case definition. An hour of the day, without a date associated with it doesn't help you much, thus, you should merge together day and time of onset of symptoms into a single variable. Moreover, you will be using this combined variable later on to create your epicurve. We can combine these two variables by using the `lubridate::ymd_h()` function.
+Having a variable that defines "time" in an outbreak investigation can be very useful when creating a case definition. An hour of the day, without a date associated with it doesn't help you much, thus, you should merge together day and time of onset of symptoms into a single variable. Moreover, you will be using this combined variable later on to estimate an incubation time and create your epicurve. We can combine these two variables by using the `lubridate::ymd_h()` function.
 
 Before we proceed, it would be wise to check if any respondents have a value for `dayonset` but not `starthour`, or vice versa. The `lubridate` date-time conversion functions do not have an explicit argument for dealing with missing values, but the `truncated = …` argument can help prevent spurious date-times being derived from a date-time combination where one value is missing.
 
