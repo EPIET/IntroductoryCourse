@@ -95,15 +95,15 @@ linelist <- linelist %>%
     gastrosymptoms == TRUE & 
       onset_datetime >= meal_datetime &
       onset_datetime <= (meal_datetime + days(2)) ~ TRUE,
-    # Those who had symptoms >48h from the meal are not cases (FALSE)
+    # Those who had symptoms >48h from the meal are non-cases (FALSE)
     gastrosymptoms == TRUE & 
       onset_datetime > (meal_datetime + days(2)) ~ FALSE,
-    # The rest are considered not cases. Including, those who had no symptoms at all, who have missing data on the onset_datetime variable, or who had symptoms before eating the meal 
+    # The rest are considered non-cases. Including, those who had no symptoms at all, who have missing data on the onset_datetime variable, or who had symptoms before eating the meal 
     .default = FALSE)
   )
 ```
 
-Note that we may be incurring in misclassification bias with the code above. The last section indicates that if a person had clinical symptoms before eating the meal, they are considered as not-cases. However, it could be that a person had symptoms before the meal, and yet, still got infected by the pathogen when eating their meal (bad luck, we know...).
+Note that we may be incurring in misclassification bias with the code above. The last section indicates that if a person had clinical symptoms before eating the meal, they are considered as non-cases. However, it could be that a person had symptoms before the meal, and yet, still got infected by the pathogen when eating their meal (bad luck, we know...).
 
 Moreover, if you remember from inject 9, there were a couple of people with an `dayonset`, but no `starthour`. The code we used (`lubridate::ymd_h` with argument `truncated = 2`) results in dates with missing `starthour` being converted to date-time, with the missing time being set to `00:00` (midnight). This means that these two people don't fulfill the case definition criteria because we marked their symptoms started early in the morning of Nov 11 (at 00:00), before the meal time (18:00), and thus, they did not "fell ill within the time period of interest".
 
