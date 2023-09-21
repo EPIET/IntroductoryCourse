@@ -34,9 +34,9 @@ pacman::p_load(rio,
 linelist <- rio::import(here::here("data", "Copenhagen_clean.xlsx"))
 ```
 
-## Identify cases
+## 3. Identify cases
 
-### Ate a meal at the school dinner
+### a) Ate a meal at the school dinner
 
 Keep in your dataset only those who ate a meal.
 
@@ -45,7 +45,7 @@ linelist <- linelist %>%
   filter(meal == TRUE)
 ```
 
-### Fell ill after the start of the meal
+### b) Fell ill after the start of the meal
 
 Create a new meal_datetime variable as per 11 Nov 2006, at 18:00h:
 
@@ -72,7 +72,7 @@ linelist <- linelist %>%
     )
 ```
 
-### Fell ill within the time period of interest
+### c) Fell ill within the time period of interest
 
 Calculate incubation time and its median:
 
@@ -122,4 +122,15 @@ linelist %>%
             hadsympt = sum(gastrosymptoms == TRUE),
             nb_cases = sum(case == TRUE)
             )
+```
+
+# 4. Export clean data
+
+Save the cleaned data set before proceeding with using your case definition to identify cases in your dataset.
+
+```{r export_clean_data}
+
+rio::export(x = linelist, 
+            file = here::here("data", "Copenhagen_clean_inj10.xlsx"))
+
 ```
