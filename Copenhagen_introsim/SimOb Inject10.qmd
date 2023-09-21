@@ -1,6 +1,6 @@
 ---
 title: "SimOb Inject 10 - Case Definition"
-format: html
+format: docx
 editor: visual
 ---
 
@@ -35,7 +35,9 @@ linelist <- rio::import(here::here("data", "Copenhagen_clean.xlsx"))
 ```
 
 ## Identify cases
+
 ### Ate a meal at the school dinner
+
 Keep in your dataset only those who ate a meal.
 
 ```{r}
@@ -54,7 +56,7 @@ linelist <- linelist %>%
   mutate(meal_datetime = lubridate::ymd_hm("2006-11-11 18:00"))
 ```
 
-Define “fell ill” as any person having had diarrhoea with OR without blood, OR vomiting. Note that we the concept of having eaten a meal is already included as per one of the steps above:
+Define "fell ill" as any person having had diarrhoea with OR without blood, OR vomiting. Note that we the concept of having eaten a meal is already included as per one of the steps above:
 
 ```{r}
 linelist <- linelist %>% 
@@ -101,19 +103,16 @@ linelist <- linelist %>%
   )
 ```
 
-Note that we may be incurring in misclassification bias with the code above. The last section indicates that if a person had clinical symptoms before eating the meal, they are considered as not-cases. However, it could be that a person had symptoms before the meal, and yet, still got infected by the pathogen when eating their meal (bad luck, we know...). 
+Note that we may be incurring in misclassification bias with the code above. The last section indicates that if a person had clinical symptoms before eating the meal, they are considered as not-cases. However, it could be that a person had symptoms before the meal, and yet, still got infected by the pathogen when eating their meal (bad luck, we know...).
 
-Moreover, if you remember from inject 9, there were a couple of people with an `dayonset`, but no `starthour`. The code we used (`lubridate::ymd_h` with argument `truncated = 2`) results in dates with missing `starthour` being converted to date-time, with the missing time being set to `00:00` (midnight). This means that these two people don't fulfill the case definition criteria because we marked their symptoms started early in the morning of Nov 11 (at 00:00), before the meal time (18:00), and thus, they did not "fell ill within the time period of interest". 
+Moreover, if you remember from inject 9, there were a couple of people with an `dayonset`, but no `starthour`. The code we used (`lubridate::ymd_h` with argument `truncated = 2`) results in dates with missing `starthour` being converted to date-time, with the missing time being set to `00:00` (midnight). This means that these two people don't fulfill the case definition criteria because we marked their symptoms started early in the morning of Nov 11 (at 00:00), before the meal time (18:00), and thus, they did not "fell ill within the time period of interest".
 
-The two situations above are a reminder that you need to be both careful and aware of the implications of your data analysis decisions. 
-
+The two situations above are a reminder that you need to be both careful and aware of the implications of your data analysis decisions.
 
 ```{r}
 # Tabulate cases:
 janitor::tabyl(dat = linelist, case)
 ```
-
-
 
 Let's have a look at how many people ate a meal, had symptoms, and were considered as cases after applying our case definition:
 
@@ -124,6 +123,3 @@ linelist %>%
             nb_cases = sum(case == TRUE)
             )
 ```
-
-
-
