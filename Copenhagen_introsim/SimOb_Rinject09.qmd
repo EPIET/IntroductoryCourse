@@ -102,7 +102,7 @@ linelist <- linelist %>%
              age == 8 & group == "student" ~ 18,              
              age == 180 & group == "student" ~ 18,              
              # Keep remaining values as is:              
-             TRUE ~ as.numeric(age)              
+             .default = as.numeric(age)              
              )                    
          ) 
 ```
