@@ -1,0 +1,160 @@
+---
+title: "SimOb Inject 11 - Descriptive analysis"
+format: html
+editor: visual
+---
+
+## 1. Install packages and load libraries
+
+```{r}
+# Load the required libraries into the current R session:
+pacman::p_load(rio, 
+               here, 
+               tidyverse, 
+               skimr,
+               plyr,
+               janitor,
+               lubridate,
+               gtsummary, 
+               flextable,
+               officer,
+               epikit, 
+               apyramid, 
+               scales)
+
+# Load EpiStats from Github:
+# pacman::p_load_gh("Epiconcept-Paris/EpiStats")
+# pacman::p_load_gh("Epiconcept-Paris/EpiStats@release_1.4-1_2020-04-21")
+```
+
+## 2. Import your data
+
+```{r, Import_data}
+# Import the raw data set:
+linelist <- rio::import(here::here("data", "Copenhagen_clean_inj10.xlsx"))%>% 
+  # Convert character columns to factors:
+  mutate_if(is.character,as.factor)
+
+# # Import the raw data set:
+# linelist <- rio::import(here::here("data", "Copenhagen_clean_inj10.xlsx"))%>% 
+#   # Convert character columns to factors:
+#   mutate(across( c(sex, group, class, 
+#                    tunaD, shrimpsD, greenD, vealD, pastaD, rocketD, sauceD, 
+#                    breadD,champagneD, beerD, redwineD, whitewineD), ~as.factor(.)))
+
+```
+
+## 3. Time
+
+### a) Incubation period histogram
+
+```{r inc_time}
+incplot <- linelist %>% 
+  #Keep cases only
+  filter(case == TRUE) %>% 
+  # Create an empty ggplot frame:
+  ggplot() +
+  # Add a histogram of incubation:
+  geom_histogram(aes(x = incubation), 
+                 # Set bin widths to 6 hours:
+                 binwidth = 6) +
+  # Adapt scale to better fit data
+  scale_x_continuous(breaks = seq(0, 48, 6)) + 
+  # Label x and y axes:
+  labs(x = "Incubation period in 6-hour bins",
+       y = "Number of cases")
+
+# Print plot:
+incplot
+```
+### b) Epicurve for date and time of onset
+
+```{r epicurve_datetime}
+
+# Fetch data:
+epicurve_date <- linelist %>% 
+  # Filter for cases where dayonset is not missing:
+  filter(case == TRUE) %>% # & !is.na(dayonset)) %>% 
+  # Add factor onset_datetime to ggplot aesthetic:
+  ggplot(aes(x = onset_datetime)) + 
+  # Add geom_bar:
+  geom_bar() +
+  # Adapt scale to data and adjust axis label angle:
+  scale_x_datetime(
+    date_breaks = "6 hours",
+    labels = label_date_short()) +
+  # Update x and y axis labels:
+  labs(x = "Date and time of onset symptoms", 
+       y = "Number of cases") +
+  # Remove unnecessary grid lines:
+  theme_bw()
+
+# Print epicurve:
+epicurve_datetime
+```
+
+
+```{r}
+epicurve_strata <- linelist %>% 
+  
+  # Filter for cases where dayonset is not missing:
+  filter(case == TRUE) %>% 
+  # Add factor onset_day to ggplot aesthetic:
+  ggplot(aes(x = onset_datetime, fill = group)) + 
+  # Add nicer fill colours:
+  scale_fill_manual(values = c("darkred", "lightblue")) +
+  # Add geom_histogram:
+  geom_bar() +
+  # Adjust x axis scales to a suitable unit:
+  scale_x_datetime(
+    date_breaks = "6 hours", 
+    labels = label_date_short()) +
+  # Update x and y axis labels:
+  labs(x = "Date and time of onset", 
+       y = "Number of cases", 
+       fill = "Group", 
+       title = "Epicurve of the outbreak, stratified by sex",
+       subtitle = str_glue("Copenhagen, November 2006, N = {sum(linelist$case)}")) +
+  # Stratify by sex:
+  facet_wrap(facets = "sex",
+             ncol = 2) +
+  # Add theme:
+  theme_bw()
+
+# Print epicurve:
+epicurve_strata 
+```
+
+## 4. Person
+
+### a) Cross-tabulation of cases with group
+
+```{r group_tabyl}
+
+linelist %>% 
+  
+  janitor::tabyl(case, group) %>% 
+  
+  adorn_totals() %>% 
+  
+  adorn_percentages() %>% 
+  
+  adorn_pct_formatting() 
+
+```
+
+### Cross-tabulation of cases with sex
+
+```{r sex_tabyl}
+
+linelist %>% 
+  
+  janitor::tabyl(case, sex) %>% 
+  
+  adorn_totals() %>% 
+  
+  adorn_percentages() %>% 
+  
+  adorn_pct_formatting() 
+
+```
