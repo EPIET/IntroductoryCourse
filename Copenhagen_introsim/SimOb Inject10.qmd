@@ -79,7 +79,9 @@ Calculate incubation time and its median:
 ```{r}
 
 linelist <- linelist %>% 
-  mutate(incubation = onset_datetime - meal_datetime)
+  mutate(incubation = onset_datetime - meal_datetime,
+         incubation = as.numeric (incubation))
+
 
 median(as.numeric(linelist$incubation), na.rm = TRUE)
 
