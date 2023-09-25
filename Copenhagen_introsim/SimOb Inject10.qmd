@@ -126,7 +126,7 @@ linelist %>%
 
 # 4. Export clean data
 
-Save the cleaned data set before proceeding with using your case definition to identify cases in your dataset.
+Finally, we can save the cleaned data set before proceeding with descriptive analysis.
 
 ```{r export_clean_data}
 
