@@ -143,7 +143,7 @@ linelist %>%
 
 ```
 
-### Cross-tabulation of cases with sex
+### b) Cross-tabulation of cases with sex
 
 ```{r sex_tabyl}
 
@@ -156,5 +156,221 @@ linelist %>%
   adorn_percentages() %>% 
   
   adorn_pct_formatting() 
+
+```
+
+### c) Extra - Pyramid
+
+Age-sex pyramid of cases
+
+```{r age_sex_pyram}
+
+linelist <- linelist %>% 
+  # Create age categories:
+  mutate(age_cat = epikit::age_categories(
+    # Name of age column:
+    x = age, 
+    # Define the age categories:
+    breakers = c(0, 10, 16, 18, 20, 50, 70)
+    )
+  )
+
+
+# Check age categories:
+janitor::tabyl(linelist, age_cat)
+
+# Pipe linelist:
+agesex <- linelist %>% 
+  # Filter for cases only:
+  filter(case == TRUE) %>% 
+  # Create age sex pyramid:
+  apyramid::age_pyramid(
+  # Specify column containing age categories:
+    age_group = "age_cat",
+    # Specify column containing sex:
+    split_by = "sex", 
+    # Don't show midpoint on the graph:
+    show_midpoint = FALSE
+    )
+
+# Print plot:
+agesex
+```
+
+(Hint: change `show_midpoint = FALSE` to `TRUE` to see skewedness in the data patterns more easily).
+
+## 5. Symptoms
+
+a) Summary table of symptoms, stratified by case definition
+
+```{r symptoms_tab}
+
+# Create summary table:
+tabsymptoms <- linelist %>% 
+    # Select person characteristics to summarise:
+  select(case, diarrhoea, bloody, vomiting,
+             abdo, nausea, fever,headache, jointpain) %>% 
+  # transform clinical symptoms to factors, so NA can be accounted properly in the table
+  dplyr::mutate(
+    across(c(diarrhoea, bloody, vomiting,
+             abdo, nausea, fever,headache, jointpain), 
+           ~as.factor(.))) %>%
+  # Make NA a explicit level of factor variables
+  dplyr::mutate(
+    across(c(diarrhoea, bloody, vomiting,
+           abdo, nausea, fever,headache, jointpain), 
+         ~forcats::fct_na_value_to_level(.))) %>% 
+    # Create the summary table:
+  gtsummary::tbl_summary(
+    # Stratify by case:
+    by = case, 
+    # Calculate row percentages:
+    percent = "column",
+    # Create nice labels:
+    label  = list(
+      diarrhoea   ~ "Diarrhoea",                           
+      bloody      ~ "Dysentary",
+      vomiting    ~ "Vomiting",
+      abdo        ~ "Abdominal pain",
+      nausea      ~ "Nausea", 
+      fever       ~ "Fever", 
+      headache    ~ "Headache", 
+      jointpain   ~ "Joint pain")
+    
+  ) %>% 
+  # Add totals:
+  add_overall() %>% 
+  # Make variable names bold and italics:
+  bold_labels() %>% 
+  italicize_labels() %>% 
+  # Modify header:
+  modify_header(
+    label = "**Characteristic**",
+    stat_0 = "**Overall**\n **N** = {N}",
+    stat_1 = "**Non-case**\n **N** = {n}",
+    stat_2 = "**Case**\n **N** = {n}", 
+    ) %>% 
+  # Convert to flextable for printing:
+  gtsummary::as_flex_table()
+
+# Print the table:
+tabsymptoms
+```
+
+b) Bar plot of symptoms stratified by case definition
+
+```{r symptom_barplot}
+
+# Create list of symptom variables:
+symptoms <- c("diarrhoea", 
+              "bloody", 
+              "vomiting", 
+              "abdo", 
+              "nausea", 
+              "fever", 
+              "headache", 
+              "jointpain")
+
+# Create nice labels for case definition:
+caselabs <- ggplot2::as_labeller(c(`FALSE` = "Non-case", 
+                                   `TRUE` = "Case"))
+# Select variables and cases:
+symptom_bar <- linelist %>% 
+  # Select symptom columns:
+  select(case, c(all_of(symptoms))) %>%
+  # Drop NAs:
+  drop_na() %>% 
+  # Reshape (pivot longer):
+  pivot_longer(!case, 
+               names_to = "Symptoms", 
+               values_drop_na = TRUE) %>% 
+  # Keep only TRUE values:
+  filter(value == TRUE) %>% 
+  # Group by symptoms and case:
+  group_by(Symptoms, case) %>% 
+  # Count for each symptom by case:
+  dplyr::summarise(count = n()) %>% 
+  # Create plot:
+  ggplot(aes(
+    # Order symptom bars so most common ones are ontop:
+    x = reorder(Symptoms, desc(count), decreasing = TRUE), 
+    y = count)) +
+  # Display bars as proportions
+  geom_bar(stat = "identity") +
+  # Update x axis label:
+  xlab("Symptoms") +
+  # Update y axis label:
+  ylab("Proportion of respondents") +
+  # Flip plot on its side so symptom labels are clear:
+  coord_flip() +
+  # Facet the plot by (labelled) case:
+  facet_wrap(facets = "case",
+             labeller = caselabs,
+             ncol = 2)
+
+# Print plot:
+symptom_bar
+```
+
+## 6. Attack proportions
+
+a) Overall attack proportion
+
+```{r attack_prop_overall}
+
+# Create table of case status:
+total_ap <- tabyl(linelist, case) %>% 
+ # Add row totals:
+  adorn_totals(where = "row") %>% 
+  # Add percentages with 1 digit after the decimal point:
+  adorn_pct_formatting(digits = 1) %>% 
+  # Filter to rows where case is TRUE:
+  filter(case == TRUE) %>% 
+  # Select the column percent:
+  select(percent) %>% 
+  # Extract (pull) the value from this cell:
+  pull()
+
+# Print result:
+total_ap
+
+```
+
+b) Attack proportions for class, group and sex by case status
+
+```{r attack_prop}
+
+# Table to calculate attack proportions:
+attack_prop <- linelist %>% 
+  # Select columns:
+  select (case, class, group, sex) %>% 
+  # Create table:
+  tbl_summary(
+    # Stratified by case
+    by = case, 
+    # With row percentages
+    percent = "row") %>%
+  # Add totals:
+  add_overall() %>%
+ # Add p values:
+  add_p() %>% 
+  # Make variable names bold and italics:
+  bold_labels() %>% 
+  italicize_labels() %>% 
+  # Modify header:
+  modify_header(
+    label = "**Characteristic**",
+    stat_0 = "**Overall** **N** = {N}",
+    stat_1 = "**Non-case** **N** = {n}",
+    stat_2 = "**Case** **N** = {n}", 
+    p.value = "**P value**"
+  ) %>% 
+  # Sort by p-value:
+  sort_p() %>% 
+  # Convert to flextable:
+  gtsummary::as_flex_table()
+
+# Print table:
+attack_prop
 
 ```
