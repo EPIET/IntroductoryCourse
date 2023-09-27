@@ -1,0 +1,77 @@
+---
+title: "SimOb Inject 14 - Univariable analysis"
+format: html
+editor: visual
+---
+
+
+## 1. Install packages and load libraries
+
+```{r}
+# Load the required libraries into the current R session:
+pacman::p_load(rio, 
+               here, 
+               tidyverse, 
+               skimr,
+               plyr,
+               janitor,
+               lubridate,
+               gtsummary, 
+               flextable,
+               officer,
+               epikit, 
+               apyramid, 
+               scales,
+               EpiStats)
+
+```
+
+## 2. Import your data
+
+```{r, Import_data}
+# Import the raw data set:
+linelist <- rio::import(here::here("data", "Copenhagen_clean_inj10.xlsx"))%>% 
+  # Convert character columns to factors:
+  mutate_if(is.character, as.factor)
+```
+
+## 3. Risk Ratios 
+
+### a) Calculate 95% CI Risk Ratios
+
+```{r}
+# Create a vector for food variables
+food_vars <- c("tuna", "shrimps", "green", "veal", 
+                "pasta", "rocket", "sauce", "bread",
+                "champagne", "beer", "redwine", "whitewine")
+# # Convert food variables (logical) to integers
+# linelist <- linelist %>% 
+#   dplyr::mutate(
+#     # clinical symptoms
+#     across(food_vars, ~as.integer(.)
+#            )
+#     )
+
+# Use the EpiStats package
+CSTable(linelist, "case", c(food_vars))
+```
+
+### b) Prepare the RR table for publication
+
+```{r}
+rr_tbl <- CSTable(linelist, "case", c(food_vars)) %>% 
+  as.data.frame() %>% 
+  flextable() %>% 
+   set_header_labels(
+     values = c("Total exposed",     
+               "Cases exposed", 
+               "AR among exposed",    
+               "Total unexposed",
+               "Cases unexposed",
+               "AR among unexposed",
+               "RR",         
+               "95% lower CI",             
+               "95% upper CI",
+               "p-value"))
+```
+
