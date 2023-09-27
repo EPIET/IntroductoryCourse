@@ -1,6 +1,6 @@
 ---
 title: "SimOb Inject 11 - Descriptive analysis"
-format: html
+format: docx
 editor: visual
 ---
 
@@ -33,7 +33,7 @@ pacman::p_load(rio,
 # Import the raw data set:
 linelist <- rio::import(here::here("data", "Copenhagen_clean_inj10.xlsx"))%>% 
   # Convert character columns to factors:
-  mutate_if(is.character,as.factor)
+  mutate_if(is.character, as.factor)
 
 # # Import the raw data set:
 # linelist <- rio::import(here::here("data", "Copenhagen_clean_inj10.xlsx"))%>% 
@@ -48,7 +48,10 @@ linelist <- rio::import(here::here("data", "Copenhagen_clean_inj10.xlsx"))%>%
 
 ### a) Incubation period histogram
 
-```{r inc_time}
+```{r}
+
+#| label: inc_time
+
 incplot <- linelist %>% 
   #Keep cases only
   filter(case == TRUE) %>% 
@@ -69,10 +72,11 @@ incplot
 ```
 ### b) Epicurve for date and time of onset
 
-```{r epicurve_datetime}
+```{r}
+#| label: epicurve date-time
 
 # Fetch data:
-epicurve_date <- linelist %>% 
+epicurve_datetime <- linelist %>% 
   # Filter for cases where dayonset is not missing:
   filter(case == TRUE) %>% # & !is.na(dayonset)) %>% 
   # Add factor onset_datetime to ggplot aesthetic:
@@ -95,6 +99,8 @@ epicurve_datetime
 
 
 ```{r}
+#| label: epicurve strata
+
 epicurve_strata <- linelist %>% 
   
   # Filter for cases where dayonset is not missing:
@@ -129,41 +135,32 @@ epicurve_strata
 
 ### a) Cross-tabulation of cases with group
 
-```{r group_tabyl}
+```{r}
+#| label: Cross-tab cases
 
 linelist %>% 
-  
   janitor::tabyl(case, group) %>% 
-  
   adorn_totals() %>% 
-  
   adorn_percentages() %>% 
-  
   adorn_pct_formatting() 
 
 ```
 
 ### b) Cross-tabulation of cases with sex
 
-```{r sex_tabyl}
+```{r}
 
 linelist %>% 
-  
   janitor::tabyl(case, sex) %>% 
-  
   adorn_totals() %>% 
-  
   adorn_percentages() %>% 
-  
   adorn_pct_formatting() 
 
 ```
 
-### c) Extra - Pyramid
+### c) Extra - Age-sex pyramid of cases
 
-Age-sex pyramid of cases
-
-```{r age_sex_pyram}
+```{r}
 
 linelist <- linelist %>% 
   # Create age categories:
@@ -203,7 +200,7 @@ agesex
 
 a) Summary table of symptoms, stratified by case definition
 
-```{r symptoms_tab}
+```{r}
 
 # Create summary table:
 tabsymptoms <- linelist %>% 
@@ -220,7 +217,8 @@ tabsymptoms <- linelist %>%
     across(c(diarrhoea, bloody, vomiting,
            abdo, nausea, fever,headache, jointpain), 
          ~forcats::fct_na_value_to_level(.))) %>% 
-    # Create the summary table:
+    
+  # Create the summary table:
   gtsummary::tbl_summary(
     # Stratify by case:
     by = case, 
@@ -238,6 +236,7 @@ tabsymptoms <- linelist %>%
       jointpain   ~ "Joint pain")
     
   ) %>% 
+  
   # Add totals:
   add_overall() %>% 
   # Make variable names bold and italics:
@@ -250,6 +249,7 @@ tabsymptoms <- linelist %>%
     stat_1 = "**Non-case**\n **N** = {n}",
     stat_2 = "**Case**\n **N** = {n}", 
     ) %>% 
+  
   # Convert to flextable for printing:
   gtsummary::as_flex_table()
 
@@ -286,7 +286,8 @@ symptom_bar <- linelist %>%
                values_drop_na = TRUE) %>% 
   # Keep only TRUE values:
   filter(value == TRUE) %>% 
-  # Group by symptoms and case:
+ 
+   # Group by symptoms and case:
   group_by(Symptoms, case) %>% 
   # Count for each symptom by case:
   dplyr::summarise(count = n()) %>% 
@@ -316,7 +317,7 @@ symptom_bar
 
 a) Overall attack proportion
 
-```{r attack_prop_overall}
+```{r}
 
 # Create table of case status:
 total_ap <- tabyl(linelist, case) %>% 
@@ -338,7 +339,7 @@ total_ap
 
 b) Attack proportions for class, group and sex by case status
 
-```{r attack_prop}
+```{r}
 
 # Table to calculate attack proportions:
 attack_prop <- linelist %>% 
