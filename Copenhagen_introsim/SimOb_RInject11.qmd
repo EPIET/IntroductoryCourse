@@ -22,25 +22,13 @@ pacman::p_load(rio,
                apyramid, 
                scales)
 
-# Load EpiStats from Github:
-# pacman::p_load_gh("Epiconcept-Paris/EpiStats")
-# pacman::p_load_gh("Epiconcept-Paris/EpiStats@release_1.4-1_2020-04-21")
 ```
 
 ## 2. Import your data
 
 ```{r, Import_data}
-# Import the raw data set:
-linelist <- rio::import(here::here("data", "Copenhagen_clean_inj10.xlsx"))%>% 
-  # Convert character columns to factors:
-  mutate_if(is.character, as.factor)
-
-# # Import the raw data set:
-# linelist <- rio::import(here::here("data", "Copenhagen_clean_inj10.xlsx"))%>% 
-#   # Convert character columns to factors:
-#   mutate(across( c(sex, group, class, 
-#                    tunaD, shrimpsD, greenD, vealD, pastaD, rocketD, sauceD, 
-#                    breadD,champagneD, beerD, redwineD, whitewineD), ~as.factor(.)))
+# Import the clean data set:
+linelist <- rio::import(here::here("data", "Copenhagen_clean2.rds")) 
 
 ```
 
@@ -70,6 +58,7 @@ incplot <- linelist %>%
 # Print plot:
 incplot
 ```
+
 ### b) Epicurve for date and time of onset
 
 ```{r}
@@ -96,7 +85,6 @@ epicurve_datetime <- linelist %>%
 # Print epicurve:
 epicurve_datetime
 ```
-
 
 ```{r}
 #| label: epicurve strata
@@ -198,7 +186,7 @@ agesex
 
 ## 5. Symptoms
 
-a) Summary table of symptoms, stratified by case definition
+a)  Summary table of symptoms, stratified by case definition
 
 ```{r}
 
@@ -257,7 +245,7 @@ tabsymptoms <- linelist %>%
 tabsymptoms
 ```
 
-b) Bar plot of symptoms stratified by case definition
+b)  Bar plot of symptoms stratified by case definition
 
 ```{r symptom_barplot}
 
@@ -315,7 +303,7 @@ symptom_bar
 
 ## 6. Attack proportions
 
-a) Overall attack proportion
+a)  Overall attack proportion
 
 ```{r}
 
@@ -337,7 +325,7 @@ total_ap
 
 ```
 
-b) Attack proportions for class, group and sex by case status
+b)  Attack proportions for class, group and sex by case status
 
 ```{r}
 
@@ -348,9 +336,7 @@ attack_prop <- linelist %>%
   # Create table:
   tbl_summary(
     # Stratified by case
-    by = case, 
-    # With row percentages
-    percent = "row") %>%
+    by = case) %>%
   # Add totals:
   add_overall() %>%
  # Add p values:

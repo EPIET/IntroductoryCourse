@@ -1,6 +1,6 @@
 ---
 title: "SimOb Inject 14 - Univariable analysis"
-format: html
+format: docx
 editor: visual
 ---
 
