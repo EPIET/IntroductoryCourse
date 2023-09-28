@@ -27,7 +27,7 @@ pacman::p_load(rio,
 ## 2. Import your data
 
 ```{r, Import_data}
-# Import the raw data set:
+# Import the clean data set:
 linelist <- rio::import(here::here("data", "Copenhagen_clean1.rds"))
 ```
 
