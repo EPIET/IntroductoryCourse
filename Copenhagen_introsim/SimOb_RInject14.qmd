@@ -4,7 +4,6 @@ format: html
 editor: visual
 ---
 
-
 ## 1. Install packages and load libraries
 
 ```{r}
@@ -30,29 +29,29 @@ pacman::p_load(rio,
 
 ```{r, Import_data}
 # Import the raw data set:
-linelist <- rio::import(here::here("data", "Copenhagen_clean_inj10.xlsx"))%>% 
-  # Convert character columns to factors:
-  mutate_if(is.character, as.factor)
+linelist <- rio::import(here::here("data", "Copenhagen_clean2.rds"))
 ```
 
-## 3. Risk Ratios 
+## 3. Risk Ratios
 
 ### a) Calculate 95% CI Risk Ratios
 
 ```{r}
-# Create a vector for food variables
+# You could use the EpiStats package for each food item
+CS(linelist, "case", "tuna")
+CS(linelist, "case", "shrimps")
+CS(linelist, "case", "green")
+CS(linelist, "case", "veal")
+# And so one
+```
+
+```{r}
+# You can save time (and probably typos!) by creating a vector for food variables...
 food_vars <- c("tuna", "shrimps", "green", "veal", 
                 "pasta", "rocket", "sauce", "bread",
                 "champagne", "beer", "redwine", "whitewine")
-# # Convert food variables (logical) to integers
-# linelist <- linelist %>% 
-#   dplyr::mutate(
-#     # clinical symptoms
-#     across(food_vars, ~as.integer(.)
-#            )
-#     )
 
-# Use the EpiStats package
+# ...and using EpiStats::CSTable() to run all variables together!
 CSTable(linelist, "case", c(food_vars))
 ```
 
@@ -75,3 +74,59 @@ rr_tbl <- CSTable(linelist, "case", c(food_vars)) %>%
                "p-value"))
 ```
 
+## 4. Hypothesis tests for other variables
+
+#### a) age
+
+```{r}
+# Check if age overall follows a normal distribution:
+shapiro.test(linelist$age)
+# Can simply have a look at
+hist(linelist$age)
+
+# Looking only at the students:
+students <- linelist %>% 
+  filter(group == "student")
+hist(students$age)
+```
+
+Age overall (nor within the students' group) is not normally distributed. We could use
+
+```{r}
+# Perform Wilcoxon rank sum test on age and sex:
+wilcox.test(age ~ case, data = linelist)
+```
+
+#### b) sex
+
+```{r}
+CS(linelist, "case", "sex")
+```
+
+#### c) class
+
+```{r}
+CS(linelist, "case", "class")
+```
+
+#### d) group
+
+```{r}
+CS(linelist, "case", "group")
+```
+
+## 5. Dose Response
+
+#### a) Veal
+
+```{r}
+# Perform the Wilcoxon rank sum test on number of veal portions
+wilcox.test(as.numeric(vealD) ~ case, data = linelist)
+```
+
+#### b) Pasta
+
+```{r}
+# Perform the Wilcoxon rank sum test on number of pasta portions
+wilcox.test(as.numeric(pastaD) ~ case, data = linelist)
+```
