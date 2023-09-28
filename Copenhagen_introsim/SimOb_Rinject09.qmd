@@ -27,9 +27,6 @@ pacman::p_load(rio,
                apyramid, 
                scales)
 
-# Load EpiStats from Github:
-# pacman::p_load_gh("Epiconcept-Paris/EpiStats")
-# pacman::p_load_gh("Epiconcept-Paris/EpiStats@release_1.4-1_2020-04-21")
 ```
 
 ## 2. Import your data
@@ -131,19 +128,18 @@ drtable
 
 ### Modify variables format
 
-We want to modify the "variable format" or "column type" of many variables, so that we can do future calculations with them.
+We want to modify the "variable format" or "column type" of many variables, so that we can do future calculations with them in the following injects (some functions will need a specific "type" of input).
 
 | Variable name                                                                                               | Original  | Desired | Hint                                                         |
-|-------------------------------------------------------------------------------------------------------------|-----------|---------|--------------------------------------------------------------|
+|---------------------------------|------------|------------|-----------------|
 | sex                                                                                                         | character | factor  | mutate(), as.factor()                                        |
 | class                                                                                                       | integer   | factor  | mutate(), as.factor()                                        |
 | All the clinical symptom variables                                                                          | integer   | logical | mutate(across()), as.logical()                               |
-| All the food variables                                                                                      | integer   | logical | mutate(across()), as.logical()                               |
-| All the food variables representing the amount of specific foods eaten (those finishing with a capital "D") | integer   | factor  |                                                              |
+| All the food variables representing the amount of specific foods eaten (those finishing with a capital "D") | integer   | factor  | mutate(across()), as.factor()                                |
 | dayonset                                                                                                    | character | date    | lubridate::dmy()                                             |
 | starthour                                                                                                   | integer   |         | paste dayonset and starthour and then use lubridate::ymd_h() |
 
-: Table 1_Inject14: Variable types to modify
+: Table 1_Inject 09: Variable types to modify
 
 #### Sex, group and class
 
@@ -174,29 +170,25 @@ linelist <- linelist %>%
     )
 ```
 
-2.  For the variables that are food items and food doses, we will show you how to first create a vector of names, following by how to the use of `mutate(across(all_of( )))` on this vector.
+2.  For the variables that are food doses, we will show you how to first create a vector of names, following by using `mutate(across(all_of( )))` on this vector.
 
 ```{r, mutate_food}
 # Create a vector with all the food variables representing the amount of specific foods items eaten (those finishing with a capital "D")
+# One way of doing it:
 food_dose <- linelist %>% 
     select(ends_with("D", ignore.case = FALSE)) %>% 
     names()
+
+# Another way of doing it:
 food_dose <- c("tunaD", "shrimpsD", "greenD", "vealD", 
                 "pastaD", "rocketD", "sauceD", "breadD",
                 "champagneD", "beerD", "redwineD", "whitewineD")
-
-# Create a vecor with all food items. To do this, we can remove the capital D of food_dose by using gsub() to replace the pattern "D" by nothing ("").
-food_items <- gsub("D", "", food_dose)
-# Add variable "meal"
-food_items <- c(food_items, "meal") 
 
 
 linelist <- linelist %>% 
   dplyr::mutate(
     # food dose variables
-    across(all_of(food_dose), ~as.factor(.)),
-    # food items variables
-    across(all_of(food_items), ~as.logical(.))) 
+    across(all_of(food_dose), ~as.factor(.))) 
   
 ```
 
@@ -258,11 +250,11 @@ head(linelist$onset_datetime)
 
 # 4. Export clean data
 
-Save the cleaned data set before proceeding with using your case definition to identify cases in your dataset.
+Save the cleaned data set before proceeding with using your case definition to identify cases in your dataset. Use the .rds format, as it preserves column classes. This ensures you will have only minimal cleaning to do after importing the data into R at the next inject.
 
 ```{r export_clean_data}
 
 rio::export(x = linelist, 
-            file = here::here("data", "Copenhagen_clean.xlsx"))
+            file = here::here("data", "Copenhagen_clean1.rds"))
 
 ```
