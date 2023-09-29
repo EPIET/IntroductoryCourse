@@ -40,15 +40,18 @@ linelist <- rio::import(here::here("data", "Copenhagen_clean2.rds"))
 
 #| label: inc_time
 
-incplot <- linelist %>% 
-  #Keep cases only
-  filter(case == TRUE) %>% 
+# Create a dataset with only cases
+cases <- linelist %>% 
+  filter(case == TRUE)
+
+incplot <- cases %>% 
   # Create an empty ggplot frame:
   ggplot() +
   # Add a histogram of incubation:
-  geom_histogram(aes(x = incubation), 
-                 # Set bin widths to 6 hours:
-                 binwidth = 6) +
+  geom_histogram(
+    mapping = aes(x = incubation), 
+    # Set bin widths to 6 hours:
+    binwidth = 6) +
   # Adapt scale to better fit data
   scale_x_continuous(breaks = seq(0, 48, 6)) + 
   # Label x and y axes:
@@ -64,14 +67,20 @@ incplot
 ```{r}
 #| label: epicurve date-time
 
-# Fetch data:
-epicurve_datetime <- linelist %>% 
-  # Filter for cases where dayonset is not missing:
-  filter(case == TRUE) %>% # & !is.na(dayonset)) %>% 
+# Create a vector with sequences every 6h from the first to the last case
+breaks_6h <- seq(from = min(cases$onset_datetime, na.rm = TRUE),
+                 to = max(cases$onset_datetime, na.rm = TRUE),
+                 by = "6 hours")
+
+# Fetch cases data:
+epicurve_datetime <- cases %>%  
   # Add factor onset_datetime to ggplot aesthetic:
-  ggplot(aes(x = onset_datetime)) + 
-  # Add geom_bar:
-  geom_bar() +
+  ggplot(
+    mapping = aes(x = onset_datetime)) + 
+  # Add geom_histogram:
+  geom_histogram(
+    # Apply the vector of requences created above
+    breaks = breaks_6h) +
   # Adapt scale to data and adjust axis label angle:
   scale_x_datetime(
     date_breaks = "6 hours",
@@ -89,16 +98,16 @@ epicurve_datetime
 ```{r}
 #| label: epicurve strata
 
-epicurve_strata <- linelist %>% 
-  
-  # Filter for cases where dayonset is not missing:
-  filter(case == TRUE) %>% 
+epicurve_strata <- cases %>% 
   # Add factor onset_day to ggplot aesthetic:
-  ggplot(aes(x = onset_datetime, fill = group)) + 
+  ggplot(
+    mapping = aes(x = onset_datetime, fill = group)) + 
   # Add nicer fill colours:
   scale_fill_manual(values = c("darkred", "lightblue")) +
-  # Add geom_histogram:
-  geom_bar() +
+    # Add geom_histogram:
+  geom_histogram(
+    # Apply the vector of requences created above
+    breaks = breaks_6h) +
   # Adjust x axis scales to a suitable unit:
   scale_x_datetime(
     date_breaks = "6 hours", 
@@ -280,7 +289,8 @@ symptom_bar <- linelist %>%
   # Count for each symptom by case:
   dplyr::summarise(count = n()) %>% 
   # Create plot:
-  ggplot(aes(
+  ggplot(
+    mapping = aes(
     # Order symptom bars so most common ones are ontop:
     x = reorder(Symptoms, desc(count), decreasing = TRUE), 
     y = count)) +
