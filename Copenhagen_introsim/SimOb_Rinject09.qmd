@@ -104,7 +104,9 @@ linelist <- linelist %>%
              age == 8 & group == "student" ~ 18,              
              age == 180 & group == "student" ~ 18,              
              # Keep remaining values as is:              
-             .default = as.numeric(age)              
+             .default = as.numeric(age)   
+             # if .default is not working, try:
+             # TRUE ~ age
              )                    
          ) 
 ```
@@ -135,14 +137,23 @@ drtable
 
 We want to modify the "variable format" or "column type" of many variables, so that we can do future calculations with them in the following injects (some functions will need a specific "type" of input).
 
-| Variable name                                                                                               | Original  | Desired | Hint                                                                             |
-|---------------------------------|------------|------------|-----------------|
-| sex                                                                                                         | character | factor  | mutate(), as.factor()                                                            |
-| class                                                                                                       | integer   | factor  | mutate(), as.factor()                                                            |
-| All the clinical symptom variables                                                                          | integer   | logical | mutate(across()), as.logical()                                                   |
-| All the food variables representing the amount of specific foods eaten (those finishing with a capital "D") | integer   | factor  | mutate(across()), as.factor()                                                    |
-| dayonset                                                                                                    | character | date    | lubridate::dmy()                                                                 |
-| starthour                                                                                                   | integer   |         | stringr::str_glue() with dayonset and starthour; and then use lubridate::ymd_h() |
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
+| Variable name                                                                                               | Original            | Desired         | Hint                                                                             |
++=============================================================================================================+=====================+=================+==================================================================================+
+| sex                                                                                                         | character           | factor          | mutate(), as.factor()                                                            |
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
+| class                                                                                                       | integer             | factor          | mutate(), as.factor()                                                            |
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
+| All the clinical symptom variables                                                                          | integer             | logical         | mutate(across()), as.logical()                                                   |
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
+| All the food variables representing the amount of specific foods eaten (those finishing with a capital "D") | integer             | factor          | mutate(across()), as.factor()                                                    |
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
+| dayonset                                                                                                    | character           | date            | lubridate::dmy()                                                                 |
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
+| starthour and dayonset together                                                                             | integer (starthour) | POSIXct, POSIXt | stringr::str_glue() with dayonset and starthour; and then use lubridate::ymd_h() |
+|                                                                                                             |                     |                 |                                                                                  |
+|                                                                                                             | date (dayonset)     |                 |                                                                                  |
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
 
 : Table 1_Inject 09: Variable types to modify
 
