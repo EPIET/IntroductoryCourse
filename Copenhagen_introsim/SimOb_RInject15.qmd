@@ -1,0 +1,94 @@
+---
+title: "SimOb Inject 15 - Stratified analysis"
+format: html
+editor: visual
+---
+
+## 1. Install packages and load libraries
+
+```{r}
+# Load the required libraries into the current R session:
+pacman::p_load(rio, 
+               here, 
+               tidyverse, 
+               skimr,
+               plyr,
+               janitor,
+               lubridate,
+               gtsummary, 
+               flextable,
+               officer,
+               epikit, 
+               apyramid, 
+               scales,
+               EpiStats)
+```
+
+## 2. Import your data
+
+```{r, Import_data}
+# Import the raw data set: 
+linelist <- rio::import(here::here("data", "Copenhagen_clean2.rds"))
+```
+
+## 3. Risk Ratio
+
+### a) Pasta as exposure of interest, stratified by having eaten veal
+
+```{r}
+stratall <- linelist %>% 
+  # Mutate across to convert cases to numeric:
+  mutate(across(.cols = case, 
+                .fns = ~ as.numeric(.)))
+
+vealstrata <- csinter(x = stratall, 
+                      cases = "case", 
+                      exposure = "pasta", 
+                      by = "veal")
+```
+
+**Pasta stratified by veal: stratum-specific risk ratios**
+
+```{r}
+# Extract second data.frame with summary results:
+vealstrata_ssrr <- vealstrata$df1 %>% 
+  # Convert to a flextable:
+  flextable::qflextable()
+
+# Print table:
+vealstrata_ssrr
+
+```
+
+**Pasta stratified by veal: MH-adjusted risk ratio**
+
+```{r}
+# Extract second data.frame with summary results:
+vealstrata_mhrr <- vealstrata$df2 %>% 
+  # Convert to a flextable:
+  flextable::qflextable()
+
+# Print table:
+vealstrata_mhrr
+
+```
+
+### b) Veal as exposure of interest, stratified by having eaten pasta
+
+```{r}
+# Pass data to the csinter function:
+pastastrata <- csinter(x = stratall, 
+                       cases = "case", 
+                       exposure = "veal", 
+                       by = "pasta")
+```
+
+### c) Champagne as exposure of interest, stratified by having eaten pasta
+
+```{r}
+# Pass data to the csinter function:
+champstrata <- csinter(x = stratall, 
+                       cases = "case", 
+                       exposure = "champagne", 
+                       by = "pasta")
+```
