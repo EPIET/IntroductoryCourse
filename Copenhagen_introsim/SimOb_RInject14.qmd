@@ -94,7 +94,8 @@ Age overall (nor within the students' group) is not normally distributed. We cou
 
 ```{r}
 # Perform Wilcoxon rank sum test on age and sex:
-wilcox.test(age ~ case, data = linelist)
+wilcox.test(age ~ case, 
+            data = linelist)
 ```
 
 #### b) sex
@@ -129,4 +130,11 @@ wilcox.test(as.numeric(vealD) ~ case, data = linelist)
 ```{r}
 # Perform the Wilcoxon rank sum test on number of pasta portions
 wilcox.test(as.numeric(pastaD) ~ case, data = linelist)
+```
+
+#### c) Champagne
+
+```{r}
+# Perform the Wilcoxon rank sum test on number of champagne portions
+wilcox.test(as.numeric(champagneD) ~ case, data = linelist)
 ```
