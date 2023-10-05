@@ -28,7 +28,7 @@ pacman::p_load(rio,
 
 ```{r, Import_data}
 # Import the clean data set:
-linelist <- rio::import(here::here("data", "Copenhagen_clean2.rds")) 
+copdata <- rio::import(here::here("data", "Copenhagen_clean2.rds")) 
 
 ```
 
@@ -41,7 +41,7 @@ linelist <- rio::import(here::here("data", "Copenhagen_clean2.rds"))
 #| label: inc_time
 
 # Create a dataset with only cases
-cases <- linelist %>% 
+cases <- copdata %>% 
   filter(case == TRUE)
 
 incplot <- cases %>% 
@@ -117,7 +117,7 @@ epicurve_strata <- cases %>%
        y = "Number of cases", 
        fill = "Group", 
        title = "Epicurve of the outbreak, stratified by sex",
-       subtitle = str_glue("Copenhagen, November 2006, N = {sum(linelist$case)}")) +
+       subtitle = str_glue("Copenhagen, November 2006, N = {sum(copdata$case)}")) +
   # Stratify by sex:
   facet_wrap(facets = "sex",
              ncol = 2) +
@@ -135,7 +135,7 @@ epicurve_strata
 ```{r}
 #| label: Cross-tab cases
 
-linelist %>% 
+copdata %>% 
   janitor::tabyl(case, group) %>% 
   adorn_totals() %>% 
   adorn_percentages() %>% 
@@ -147,7 +147,7 @@ linelist %>%
 
 ```{r}
 
-linelist %>% 
+copdata %>% 
   janitor::tabyl(case, sex) %>% 
   adorn_totals() %>% 
   adorn_percentages() %>% 
@@ -159,7 +159,7 @@ linelist %>%
 
 ```{r}
 
-linelist <- linelist %>% 
+copdata <- copdata %>% 
   # Create age categories:
   mutate(age_cat = epikit::age_categories(
     # Name of age column:
@@ -171,10 +171,10 @@ linelist <- linelist %>%
 
 
 # Check age categories:
-janitor::tabyl(linelist, age_cat)
+janitor::tabyl(copdata, age_cat)
 
-# Pipe linelist:
-agesex <- linelist %>% 
+# Pipe copdata:
+agesex <- copdata %>% 
   # Filter for cases only:
   filter(case == TRUE) %>% 
   # Create age sex pyramid:
@@ -200,20 +200,20 @@ a)  Summary table of symptoms, stratified by case definition
 ```{r}
 
 # Create summary table:
-tabsymptoms <- linelist %>% 
+tabsymptoms <- copdata %>% 
     # Select person characteristics to summarise:
   select(case, diarrhoea, bloody, vomiting,
              abdo, nausea, fever,headache, jointpain) %>% 
   # transform clinical symptoms to factors, so NA can be accounted properly in the table
   dplyr::mutate(
-    across(c(diarrhoea, bloody, vomiting,
+    across(.cols = c(diarrhoea, bloody, vomiting,
              abdo, nausea, fever,headache, jointpain), 
-           ~as.factor(.))) %>%
+           .fns = ~as.factor(.))) %>%
   # Make NA a explicit level of factor variables
   dplyr::mutate(
-    across(c(diarrhoea, bloody, vomiting,
-           abdo, nausea, fever,headache, jointpain), 
-         ~forcats::fct_na_value_to_level(.))) %>% 
+    across(.cols = c(diarrhoea, bloody, vomiting,
+           abdo, nausea, fever,headache, jointpain),
+           .fns = ~forcats::fct_na_value_to_level(.))) %>% 
     
   # Create the summary table:
   gtsummary::tbl_summary(
@@ -245,10 +245,7 @@ tabsymptoms <- linelist %>%
     stat_0 = "**Overall**\n **N** = {N}",
     stat_1 = "**Non-case**\n **N** = {n}",
     stat_2 = "**Case**\n **N** = {n}", 
-    ) %>% 
-  
-  # Convert to flextable for printing:
-  gtsummary::as_flex_table()
+    )
 
 # Print the table:
 tabsymptoms
@@ -272,7 +269,7 @@ symptoms <- c("diarrhoea",
 caselabs <- ggplot2::as_labeller(c(`FALSE` = "Non-case", 
                                    `TRUE` = "Case"))
 # Select variables and cases:
-symptom_bar <- linelist %>% 
+symptom_bar <- copdata %>% 
   # Select symptom columns:
   select(case, c(all_of(symptoms))) %>%
   # Drop NAs:
@@ -318,7 +315,7 @@ a)  Overall attack proportion
 ```{r}
 
 # Create table of case status:
-total_ap <- tabyl(linelist, case) %>% 
+total_ap <- tabyl(copdata, case) %>% 
  # Add row totals:
   adorn_totals(where = "row") %>% 
   # Add percentages with 1 digit after the decimal point:
@@ -340,7 +337,7 @@ b)  Attack proportions for class, group and sex by case status
 ```{r}
 
 # Table to calculate attack proportions:
-attack_prop <- linelist %>% 
+attack_prop <- copdata %>% 
   # Select columns:
   select (case, class, group, sex) %>% 
   # Create table:
@@ -363,9 +360,7 @@ attack_prop <- linelist %>%
     p.value = "**P value**"
   ) %>% 
   # Sort by p-value:
-  sort_p() %>% 
-  # Convert to flextable:
-  gtsummary::as_flex_table()
+  sort_p()
 
 # Print table:
 attack_prop

@@ -28,7 +28,7 @@ pacman::p_load(rio,
 
 ```{r, Import_data}
 # Import the clean data set:
-linelist <- rio::import(here::here("data", "Copenhagen_clean1.rds"))
+copdata <- rio::import(here::here("data", "Copenhagen_clean1.rds"))
 ```
 
 ## 3. Identify cases
@@ -38,7 +38,7 @@ linelist <- rio::import(here::here("data", "Copenhagen_clean1.rds"))
 Keep in your dataset only those who ate a meal.
 
 ```{r}
-linelist <- linelist %>% 
+copdata <- copdata %>% 
   filter(meal == TRUE)
 ```
 
@@ -47,8 +47,8 @@ linelist <- linelist %>%
 Create a new meal_datetime variable as per 11 Nov 2006, at 18:00h:
 
 ```{r}
-# Start with linelist:
-linelist <- linelist %>% 
+# Start with copdata:
+copdata <- copdata %>% 
   # Create new column for meal date and time:
   mutate(meal_datetime = lubridate::ymd_hm("2006-11-11 18:00"))
 ```
@@ -56,7 +56,7 @@ linelist <- linelist %>%
 Define "fell ill" as any person having had diarrhoea with OR without blood, OR vomiting. Note that we the concept of having eaten a meal is already included as per one of the steps above:
 
 ```{r}
-linelist <- linelist %>% 
+copdata <- copdata %>% 
   mutate(gastrosymptoms = case_when(
     # Those had diarrhoea...
     diarrhoea == TRUE |
@@ -75,12 +75,12 @@ Calculate incubation time and its median:
 
 ```{r}
 
-linelist <- linelist %>% 
+copdata <- copdata %>% 
   mutate(incubation = onset_datetime - meal_datetime,
          incubation = as.numeric (incubation))
 
 
-median(as.numeric(linelist$incubation), na.rm = TRUE)
+median(as.numeric(copdata$incubation), na.rm = TRUE)
 
 ```
 
@@ -88,7 +88,7 @@ We see that the median incubation time is 15 hours. This is useful information, 
 
 ```{r}
 
-linelist <- linelist %>% 
+copdata <- copdata %>% 
   mutate(case = case_when(
     # Those who had symptoms <48h from the meal are cases (TRUE)
     gastrosymptoms == TRUE & 
@@ -110,13 +110,13 @@ The two situations above are a reminder that you need to be both careful and awa
 
 ```{r}
 # Tabulate cases:
-janitor::tabyl(dat = linelist, case)
+janitor::tabyl(dat = copdata, case)
 ```
 
 Let's have a look at how many people ate a meal, had symptoms, and were considered as cases after applying our case definition:
 
 ```{r overview}
-linelist %>% 
+copdata %>% 
   summarise(atemeal = sum(meal == TRUE),
             hadsympt = sum(gastrosymptoms == TRUE),
             nb_cases = sum(case == TRUE)
@@ -129,7 +129,7 @@ Finally, we can save the cleaned data set before proceeding with descriptive ana
 
 ```{r export_clean_data}
 
-rio::export(x = linelist, 
+rio::export(x = copdata, 
             file = here::here("data", "Copenhagen_clean2.rds"))
 
 ```

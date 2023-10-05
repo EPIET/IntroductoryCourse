@@ -1,6 +1,6 @@
 ---
 title: "SimOb Inject 15 - Stratified analysis"
-format: html
+format: docx
 editor: visual
 ---
 
@@ -28,7 +28,7 @@ pacman::p_load(rio,
 
 ```{r, Import_data}
 # Import the raw data set: 
-linelist <- rio::import(here::here("data", "Copenhagen_clean2.rds"))
+copdata <- rio::import(here::here("data", "Copenhagen_clean2.rds"))
 ```
 
 ## 3. Risk Ratio
@@ -36,7 +36,7 @@ linelist <- rio::import(here::here("data", "Copenhagen_clean2.rds"))
 ### a) Pasta as exposure of interest, stratified by having eaten veal
 
 ```{r}
-stratall <- linelist %>% 
+stratall <- copdata %>% 
   # Mutate across to convert cases to numeric:
   mutate(across(.cols = case, 
                 .fns = ~ as.numeric(.)))

@@ -3,7 +3,7 @@ title: "SimOb Inject 09 - Data import and cleaning"
 format: docx
 editor: visual
 execute: 
-  output: false
+  output: true
 ---
 
 ## 1. Install packages and load libraries
@@ -33,18 +33,17 @@ pacman::p_load(rio,
 
 ```{r, Import_data}
 # Import the raw data set:
-linelist <- rio::import(here::here("data", "Copenhagen_raw.csv"))
+copdata <- rio::import(here::here("data", "Copenhagen_raw.csv"))
 ```
 
 ## 3. Explore and clean your data
 
 ```{r, Explore_data}
-
-head(linelist)
-dim(linelist)
-str(linelist)
-skimr::skim(linelist)
-names(linelist)
+head(copdata)
+dim(copdata)
+str(copdata)
+skimr::skim(copdata)
+names(copdata)
 
 ```
 
@@ -56,9 +55,9 @@ Through visual exploration of the `age` histogram we see that there is at least 
 
 ```{r age_exploration}
 # Have a look at the histogram  
-hist(linelist$age)   
+hist(copdata$age)   
 # Create cross-tab with the group variable:  
-janitor::tabyl(dat = linelist, 
+janitor::tabyl(dat = copdata, 
                var1 = age, 
                var2 = group)
 ```
@@ -67,7 +66,7 @@ Note that `group` is coded as 0 and 1, and these may be difficult to interpret w
 
 ```{r recode_group}
 # Convert group to a factor and label 0 as teacher, 1 as student:
-linelist <- linelist %>% 
+copdata <- copdata %>% 
   mutate(group = factor(group, 
                         labels = c("teacher", "student")))
 
@@ -77,7 +76,7 @@ Now, have a look at your cross-tab again:
 
 ```{r cross-tab_age_group}
 
-janitor::tabyl(dat = linelist, 
+janitor::tabyl(dat = copdata, 
                var1 = age, 
                var2 = group) 
 ```
@@ -95,7 +94,7 @@ Assuming you have contacted the school to make sure your suspicions about the ac
 ```{r age_cleaning}
 
 # Update incorrect ages to the correct values with case_when:  
-linelist <- linelist %>%       
+copdata <- copdata %>%       
   mutate(age =                         
            case_when(                            
              # Where respondent is 16 and a teacher, change age to 61:
@@ -121,7 +120,7 @@ Now let's create a summary table of the dose response columns.
 #| tbl-cap: no caption
 
 # Create summary table for dose response columns: 
-drtable <- linelist %>%       
+drtable <- copdata %>%       
   # Select all the columns with column names that end in upper case 'D':   
   select(ends_with("D", ignore.case = FALSE)) %>%       
   # Create the summary table, excluding missing values:   
@@ -162,7 +161,7 @@ We want to modify the "variable format" or "column type" of many variables, so t
 Let's start transforming one-by-one the first two variables in the table: `sex`, and `class`.
 
 ```{r, mutate_simple}
-linelist <- linelist %>% 
+copdata <- copdata %>% 
   dplyr::mutate(
     sex = as.factor(sex),
     class = as.factor(class))
@@ -176,7 +175,7 @@ For these variables, we are going to show you a couple of different ways to carr
 1.  For the variables that are clinical symptoms, we will list them one by one and show you the use of `mutate(across( ))`.
 
 ```{r, mutate_cs}
-linelist <- linelist %>% 
+copdata <- copdata %>% 
   dplyr::mutate(
     # clinical symptoms
     across(.cols = c(diarrhoea, bloody, vomiting,
@@ -191,7 +190,7 @@ linelist <- linelist %>%
 ```{r, mutate_food}
 # Create a vector with all the food variables representing the amount of specific foods items eaten (those finishing with a capital "D")
 # One way of doing it:
-food_dose <- linelist %>% 
+food_dose <- copdata %>% 
     dplyr::select(
       ends_with("D", ignore.case = FALSE)) %>% 
     names()
@@ -202,7 +201,7 @@ food_dose <- c("tunaD", "shrimpsD", "greenD", "vealD",
                 "champagneD", "beerD", "redwineD", "whitewineD")
 
 
-linelist <- linelist %>% 
+copdata <- copdata %>% 
   dplyr::mutate(
     # food dose variables
     across(.cols = all_of(food_dose), 
@@ -218,17 +217,17 @@ You can use `lubridate::dmy()` to mutate the `dayonset` variable into a date var
 
 ```{r correct_date_format}
 # Have a look at how the data is stored
-head(linelist$dayonset)
-class(linelist$dayonset)
+head(copdata$dayonset)
+class(copdata$dayonset)
 
-# Update linelist:
-linelist <- linelist %>% 
+# Update copdata:
+copdata <- copdata %>% 
   # Change column to date class:
   dplyr::mutate(
     dayonset = lubridate::dmy(dayonset))
 
 # Check class of updated column:
-class(linelist$dayonset)
+class(copdata$dayonset)
 ```
 
 Having a variable that defines "time" in an outbreak investigation can be very useful when creating a case definition. An hour of the day, without a date associated with it doesn't help you much, thus, you should merge together day and time of onset of symptoms into a single variable. Moreover, you will be using this combined variable later on to estimate an incubation period and create your epicurve. We can combine these two variables by using the `lubridate::ymd_h()` function.
@@ -239,7 +238,7 @@ We can check if we have any missing values by cross-tabulating `starthour` with 
 
 ```{r crosstab_dayonset_starthour}
 # Cross-tabulate dayonset with starthour:
-janitor::tabyl(dat = linelist, 
+janitor::tabyl(dat = copdata, 
                var1 = starthour, 
                var2 = dayonset)
 ```
@@ -247,7 +246,7 @@ janitor::tabyl(dat = linelist,
 This shows us that there are two respondents who had an onset date, but are missing onset time (`starthour`). Since `starthour` is represented by 1 - 2 digits, we can specify that we want `lubridate` to also parse date-time combinations that are truncated by up to two digits:
 
 ```{r combine_date_time}
-linelist <- linelist %>% 
+copdata <- copdata %>% 
   # Combine dayonset and starthour in a new date time variable:
   mutate(onset_datetime = 
            lubridate::ymd_h(
@@ -264,9 +263,9 @@ Now we can check that everything in the new combined date-time variable has pars
 
 ```{r check_onset_datetime}
 
-head(linelist$dayonset)
-head(linelist$starthour)
-head(linelist$onset_datetime)
+head(copdata$dayonset)
+head(copdata$starthour)
+head(copdata$onset_datetime)
 ```
 
 # 4. Export clean data
@@ -275,7 +274,7 @@ Save the cleaned data set before proceeding with using your case definition to i
 
 ```{r export_clean_data}
 
-rio::export(x = linelist, 
+rio::export(x = copdata, 
             file = here::here("data", "Copenhagen_clean1.rds"))
 
 ```
