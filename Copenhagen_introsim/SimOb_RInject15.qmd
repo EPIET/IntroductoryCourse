@@ -83,6 +83,14 @@ pastastrata <- csinter(x = stratall,
                        by = "pasta")
 ```
 
+Let's check if pasta is associated with veal (if we are thinking veal may be a confounder, we need to see if there is an association between the potential confounder (veal) and the exposure (pasta)):
+
+```{r}
+# Perform Wilcoxon rank sum test on age and sex:
+wilcox.test(pasta ~ veal, 
+            data = copdata)
+```
+
 ### c) Champagne as exposure of interest, stratified by having eaten pasta
 
 ```{r}
