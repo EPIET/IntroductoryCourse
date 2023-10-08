@@ -1,5 +1,5 @@
 ---
-title: "SimOb Inject 10 - Case Definition"
+title: "Solution: SimOb Inject 10 - Case Definition"
 format: docx
 editor: visual
 ---
@@ -44,15 +44,6 @@ copdata <- copdata %>%
 
 ### b) Fell ill after the start of the meal
 
-Create a new meal_datetime variable as per 11 Nov 2006, at 18:00h:
-
-```{r}
-# Start with copdata:
-copdata <- copdata %>% 
-  # Create new column for meal date and time:
-  mutate(meal_datetime = lubridate::ymd_hm("2006-11-11 18:00"))
-```
-
 Define "fell ill" as any person having had diarrhoea with OR without blood, OR vomiting. Note that we the concept of having eaten a meal is already included as per one of the steps above:
 
 ```{r}
@@ -70,6 +61,15 @@ copdata <- copdata %>%
 ```
 
 ### c) Fell ill within the time period of interest
+
+Create a new meal_datetime variable as per 11 Nov 2006, at 18:00h:
+
+```{r}
+# Start with copdata:
+copdata <- copdata %>% 
+  # Create new column for meal date and time:
+  mutate(meal_datetime = lubridate::ymd_hm("2006-11-11 18:00"))
+```
 
 Calculate incubation time and its median:
 

@@ -1,5 +1,5 @@
 ---
-title: "SimOb Inject 15 - Stratified analysis"
+title: "Solution: SimOb Inject 15 - Stratified analysis"
 format: docx
 editor: visual
 ---
@@ -33,7 +33,7 @@ copdata <- rio::import(here::here("data", "Copenhagen_clean2.rds"))
 
 ## 3. Risk Ratio
 
-### a) Pasta as exposure of interest, stratified by having eaten veal
+### a) Veal as exposure of interest, stratified by having eaten pasta
 
 ```{r}
 stratall <- copdata %>% 
@@ -41,52 +41,19 @@ stratall <- copdata %>%
   mutate(across(.cols = case, 
                 .fns = ~ as.numeric(.)))
 
-vealstrata <- csinter(x = stratall, 
-                      cases = "case", 
-                      exposure = "pasta", 
-                      by = "veal")
-```
-
-**Pasta stratified by veal: stratum-specific risk ratios**
-
-```{r}
-# Extract second data.frame with summary results:
-vealstrata_ssrr <- vealstrata$df1 %>% 
-  # Convert to a flextable:
-  flextable::qflextable()
-
-# Print table:
-vealstrata_ssrr
-
-```
-
-**Pasta stratified by veal: MH-adjusted risk ratio**
-
-```{r}
-# Extract second data.frame with summary results:
-vealstrata_mhrr <- vealstrata$df2 %>% 
-  # Convert to a flextable:
-  flextable::qflextable()
-
-# Print table:
-vealstrata_mhrr
-
-```
-
-### b) Veal as exposure of interest, stratified by having eaten pasta
-
-```{r}
 # Pass data to the csinter function:
 pastastrata <- csinter(x = stratall, 
                        cases = "case", 
                        exposure = "veal", 
                        by = "pasta")
+
+pastastrata
 ```
 
 Let's check if pasta is associated with veal (if we are thinking veal may be a confounder, we need to see if there is an association between the potential confounder (veal) and the exposure (pasta)):
 
 ```{r}
-# Perform Wilcoxon rank sum test on age and sex:
+# Perform Wilcoxon rank sum test on pasta and veal:
 wilcox.test(pasta ~ veal, 
             data = copdata)
 ```

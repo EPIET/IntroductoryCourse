@@ -1,5 +1,5 @@
 ---
-title: "SimOb Inject 11 - Descriptive analysis"
+title: "Solution: SimOb Inject 11 - Descriptive analysis"
 format: docx
 editor: visual
 ---
@@ -308,6 +308,7 @@ symptom_bar <- copdata %>%
 symptom_bar
 ```
 
+
 ## 6. Attack proportions
 
 a)  Overall attack proportion
@@ -340,27 +341,29 @@ b)  Attack proportions for class, group and sex by case status
 attack_prop <- copdata %>% 
   # Select columns:
   select (case, class, group, sex) %>% 
+  
   # Create table:
   tbl_summary(
     # Stratified by case
-    by = case) %>%
+    by = case,
+    # with row percentages
+    percent = "row") %>%
+  
   # Add totals:
   add_overall() %>%
- # Add p values:
-  add_p() %>% 
+  
   # Make variable names bold and italics:
   bold_labels() %>% 
   italicize_labels() %>% 
+  
   # Modify header:
   modify_header(
     label = "**Characteristic**",
     stat_0 = "**Overall** **N** = {N}",
     stat_1 = "**Non-case** **N** = {n}",
-    stat_2 = "**Case** **N** = {n}", 
-    p.value = "**P value**"
-  ) %>% 
-  # Sort by p-value:
-  sort_p()
+    stat_2 = "**Case** **N** = {n}"
+  )
+
 
 # Print table:
 attack_prop

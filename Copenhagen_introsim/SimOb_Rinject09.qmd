@@ -1,9 +1,7 @@
 ---
-title: "SimOb Inject 09 - Data import and cleaning"
+title: "Solution: SimOb Inject 09 - Data import and cleaning"
 format: docx
 editor: visual
-execute: 
-  output: true
 ---
 
 ## 1. Install packages and load libraries
@@ -124,35 +122,33 @@ drtable <- copdata %>%
   # Select all the columns with column names that end in upper case 'D':   
   select(ends_with("D", ignore.case = FALSE)) %>%       
   # Create the summary table, excluding missing values:   
-  gtsummary::tbl_summary(missing = "no") %>%       
-  # Convert to flextable:   
-  gtsummary::as_flex_table() 
+  gtsummary::tbl_summary(missing = "no") 
 
   # Print the summary table: 
 drtable
 ```
 
-### Modify variables format
+## 4. Modify variables format
 
 We want to modify the "variable format" or "column type" of many variables, so that we can do future calculations with them in the following injects (some functions will need a specific "type" of input).
 
-+-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
-| Variable name                                                                                               | Original            | Desired         | Hint                                                                             |
-+=============================================================================================================+=====================+=================+==================================================================================+
-| sex                                                                                                         | character           | factor          | mutate(), as.factor()                                                            |
-+-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
-| class                                                                                                       | integer             | factor          | mutate(), as.factor()                                                            |
-+-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
-| All the clinical symptom variables                                                                          | integer             | logical         | mutate(across()), as.logical()                                                   |
-+-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
-| All the food variables representing the amount of specific foods eaten (those finishing with a capital "D") | integer             | factor          | mutate(across()), as.factor()                                                    |
-+-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
-| dayonset                                                                                                    | character           | date            | lubridate::dmy()                                                                 |
-+-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
-| starthour and dayonset together                                                                             | integer (starthour) | POSIXct, POSIXt | stringr::str_glue() with dayonset and starthour; and then use lubridate::ymd_h() |
-|                                                                                                             |                     |                 |                                                                                  |
-|                                                                                                             | date (dayonset)     |                 |                                                                                  |
-+-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+----------------------------------------------------------------------------------+
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+--------------------------------------------------------------------------------------+
+| Variable name                                                                                               | Original            | Desired         | Hint                                                                                 |
++=============================================================================================================+=====================+=================+======================================================================================+
+| sex                                                                                                         | character           | factor          | mutate(), as.factor()                                                                |
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+--------------------------------------------------------------------------------------+
+| class                                                                                                       | integer             | factor          | mutate(), as.factor()                                                                |
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+--------------------------------------------------------------------------------------+
+| All the clinical symptom variables                                                                          | integer             | logical         | mutate(across()), as.logical()                                                       |
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+--------------------------------------------------------------------------------------+
+| All the food variables representing the amount of specific foods eaten (those finishing with a capital "D") | integer             | factor          | mutate(across()), as.factor()                                                        |
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+--------------------------------------------------------------------------------------+
+| dayonset                                                                                                    | character           | date            | lubridate::dmy()                                                                     |
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+--------------------------------------------------------------------------------------+
+| starthour and dayonset together                                                                             | integer (starthour) | POSIXct, POSIXt | lubridate::ymd_h() could have inside stringr::str_glue() with dayonset and starthour |
+|                                                                                                             |                     |                 |                                                                                      |
+|                                                                                                             | date (dayonset)     |                 |                                                                                      |
++-------------------------------------------------------------------------------------------------------------+---------------------+-----------------+--------------------------------------------------------------------------------------+
 
 : Table 1_Inject 09: Variable types to modify
 
@@ -268,7 +264,7 @@ head(copdata$starthour)
 head(copdata$onset_datetime)
 ```
 
-# 4. Export clean data
+## 5. Export clean data
 
 Save the cleaned data set before proceeding with using your case definition to identify cases in your dataset. Use the .rds format, as it preserves column classes. This ensures you will have only minimal cleaning to do after importing the data into R at the next inject.
 

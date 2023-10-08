@@ -1,5 +1,5 @@
 ---
-title: "SimOb Inject 14 - Univariable analysis"
+title: "Solution: SimOb Inject 14 - Univariable analysis"
 format: docx
 editor: visual
 ---
@@ -37,6 +37,10 @@ copdata <- rio::import(here::here("data", "Copenhagen_clean2.rds"))
 
 #### a) age
 
+With the Shapiro-Wilk test we check if the variables are following the normal distribution. The null hypothesis is that the data follow a normal distribution, therefore, rejecting the null hypothesis means that the data do not follow the normal distribution. A p-value below the cutoff for rejecting the null hypothesis, e.g., a p-value<0.05 means that we reject the null hypothesis that the data follow the normal distribution.
+For age, the p-value is <0.05, therefore we reject the null hypothesis that the data are normally distributed. As we see in the graph most frequently reported age is <20 years.
+
+
 ```{r}
 # Check if age overall follows a normal distribution:
 shapiro.test(copdata$age)
@@ -50,6 +54,8 @@ hist(students$age)
 ```
 
 Age overall (nor within the students' group) is not normally distributed.
+
+We compare the age for cases and non-cases using the Wilcoxon test that is used when the data are not normally distributed. The null hypothesis is that there is no difference in the age between the two groups compared. Given that p-value>0.05 we do not reject the null hypothesis.
 
 ```{r}
 # Perform Wilcoxon rank sum test on age and sex:
@@ -100,6 +106,10 @@ copdata %>%
 
 ## 4. Risk Ratios
 
+The risk ratios of each food item (including the 2x2 table) are reported below. The output of the CS() command is two tables (one with the 2x2 table and one with the risk difference, the risk ratio and the attributable fraction among exposed as well as the attributable fraction among the population (and the confidence intervals for all the estimates). The Chi-square and the p-value are also reported. 
+In the second part, a table with all the food items is printed including attack rates for exposed and unexposed as well as risk ratios and the 95% confidence intervals (CI ll and CI ul, for the lower and upper interval) and p-values.
+
+
 ### a) Calculate 95% CI Risk Ratios for food
 
 ```{r}
@@ -145,14 +155,27 @@ rr_tbl <- CSTable(copdata, "case", food_vars) %>%
 
 ## 5. Dose Response
 
-#### a) Veal
+#### a) Pasta
 
 ```{r}
-#Binomial regression for RRs 
-binom_vealD <- glm(case ~ vealD, data = copdata, 
+# Binomial regression for RRs. 
+# The outcome needs to be exponentiated so we can interpret it properly!
+binom_pastaD <- glm(case ~ pastaD, data = copdata, 
              family = binomial(link = "log"))
 
-# To get exponentiated
+# To get exponentiated:
+binom_pastaD_exp <- glm(case ~ pastaD, data = copdata, 
+                       family = binomial(link = "log")) %>% 
+  tidy(exponentiate = TRUE, 
+       conf.int = TRUE)
+
+binom_pastaD_exp
+```
+#### b) Veal
+
+```{r}
+
+# Let's get the results directly exponentiated
 binom_vealD_exp <- glm(case ~ vealD, data = copdata, 
                        family = binomial(link = "log")) %>% 
   tidy(exponentiate = TRUE, 
@@ -161,19 +184,15 @@ binom_vealD_exp <- glm(case ~ vealD, data = copdata,
 binom_vealD_exp
 ```
 
-#### b) Pasta
+#### c) Champagne
 
 ```{r}
-#Binomial regression for RRs 
-binom_pastaD <- glm(case ~ pastaD, data = copdata, 
-             family = binomial(link = "log"))
-
-# To get exponentiated
-binom_pastaD_exp <- glm(case ~ pastaD, data = copdata, 
+# Let's get the results directly exponentiated
+binom_champagneD_exp <- glm(case ~ champagneD, data = copdata, 
                        family = binomial(link = "log")) %>% 
   tidy(exponentiate = TRUE, 
        conf.int = TRUE)
 
-binom_pastaD_exp
+binom_champagneD_exp
 ```
 
