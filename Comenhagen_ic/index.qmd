@@ -1,5 +1,5 @@
 ---
-title: "Copenhagen_IC_qmd"
+title: "Copenhagen Introductory Course"
 ---
 
 This is a Quarto website.
