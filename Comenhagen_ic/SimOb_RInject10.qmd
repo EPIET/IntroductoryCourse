@@ -1,5 +1,5 @@
 ---
-title: "Solution: SimOb Inject 10 - Case Definition"
+title: "Case Definition - Inj10"
 format: docx
 editor: visual
 ---

@@ -1,6 +1,5 @@
 ---
-title: "Solution: SimOb Inject 09 - Data import and cleaning"
-format: docx
+title: "Data import and cleaning - Inj09"
 editor: visual
 ---
 
