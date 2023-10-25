@@ -3,12 +3,16 @@ project:
   output-dir: docs
 
 website:
-  title: "Copenhagen_IC_qmd"
+  title: "Copenhagen Introductory Course"
   navbar:
     left:
       - href: index.qmd
         text: Home
-      - about.qmd
+      - SimOb_RInject09.qmd
+      - SimOb_RInject10.qmd
+      - SimOb_RInject11.qmd
+      - SimOb_RInject14.qmd
+      - SimOb_RInject15.qmd
 
 format:
   html:
