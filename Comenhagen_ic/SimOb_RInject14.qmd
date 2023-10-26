@@ -1,6 +1,5 @@
 ---
 title: "Univariable analysis - Inj14"
-format: docx
 editor: visual
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Descriptive analysis - Inj11"
-format: docx
 editor: visual
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Stratified analysis - Inj15"
-format: docx
 editor: visual
 ---
 

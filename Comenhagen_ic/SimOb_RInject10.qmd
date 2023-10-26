@@ -1,6 +1,5 @@
 ---
 title: "Case Definition - Inj10"
-format: docx
 editor: visual
 ---
 
