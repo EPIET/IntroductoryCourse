@@ -1,5 +1,6 @@
 ---
 title: "Copenhagen Introductory Course"
+format: html
 ---
 
 This is a Quarto website.
